@@ -8,20 +8,30 @@ import static org.junit.Assert.assertEquals;
 public class MalformedFixMessageTest extends FixMessageTestBase {
 
     @Test
-    public void parseSimpleFixMessageWithMissingDelimiterAfterChecksum() {
+    public void throwExceptionForMissingTagAtTheStartOfMessage() {
         try {
-            parser.parse(getBytes("8=FIX.4.4\u000110=092"));
+            parser.parse(getBytes("=FIX.4.4\u000110=092\u0001"));
         } catch (MalformedFixMessageException e) {
-            assertEquals("Unable to parse due to missing delimiter", e.getMessage());
+            assertEquals("Unable to parse fix message due to malformed tag value pair", e.getMessage());
         }
     }
 
     @Test
-    public void parseSimpleFixMessageWithMissingTag() {
+    public void throwExceptionForMissingTagAtTheEndOfMessage() {
         try {
-            parser.parse(getBytes("=FIX.4.4\u000110=092\u0001"));
+            parser.parse(getBytes("8=FIX.4.4\u0001=092\u0001"));
         } catch (MalformedFixMessageException e) {
-            assertEquals("Unable to parse fix message due to missing tag", e.getMessage());
+            assertEquals("Unable to parse fix message due to malformed tag value pair", e.getMessage());
         }
     }
+
+    @Test
+    public void throwExceptionForMissingEqualsChar() {
+        try {
+            parser.parse(getBytes("8FIX.4.4\u000110=092\u0001"));
+        } catch (MalformedFixMessageException e) {
+            assertEquals("Unable to parse fix message due to malformed tag value pair", e.getMessage());
+        }
+    }
+
 }

@@ -3,6 +3,7 @@ package com.jpm.fixparser;
 
 import com.jpm.exception.ErrorMessages;
 import com.jpm.exception.MalformedFixMessageException;
+import com.sun.istack.internal.Nullable;
 
 import java.util.Arrays;
 
@@ -49,7 +50,7 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
             if (parsingNextTag) {
                 if (msg[i] == '=') {
                     //-- Link parsed fix tag to its lookup Index
-                    if(fixTag == 0 || fixTag > maxNumberOfFixTagsSupported) {
+                    if(fixTag <= 0 || fixTag > maxNumberOfFixTagsSupported) {
                         throw new MalformedFixMessageException(MISSING_TAG);
                     }
                     fixTags[currentTagIndex] = fixTag;
@@ -92,6 +93,7 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
      * @param tag
      * @return
      */
+    @Nullable
     public byte[] getByteValueForTag(int tag) {
         int index = tagLookupIndices[tag];
         if (index != -1) {
@@ -101,6 +103,6 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
             System.arraycopy(rawFixMessage, start, value, 0, length);
             return value;
         }
-        return new byte[0];
+        return null;
     }
 }

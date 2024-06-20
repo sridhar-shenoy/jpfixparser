@@ -4,8 +4,9 @@ import com.jpm.exception.MalformedFixMessageException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class SimpleFixMessageSanityTest extends FixMessageTestBase {
+public class SimpleFixMessageParsingSanityTest extends FixMessageTestBase {
 
     @Test
     public void parseSimpleFixMessageForStringValues() throws MalformedFixMessageException {
@@ -54,8 +55,20 @@ public class SimpleFixMessageSanityTest extends FixMessageTestBase {
         parser.parse(getBytes("8=FIX.4.4\u000121=1\u0001"));
         parser.parse(getBytes("8=FIX.4.4\u000122=2\u0001"));
 
-        assertEquals("", toString(parser.getByteValueForTag(21)));
+        assertNull(parser.getByteValueForTag(21));
+    }
 
+    @Test
+    public void multipleParsingOfFixMessageReturnsLatest() throws MalformedFixMessageException {
+        parser.parse(getBytes("8=FIX.4.4\u000121=1\u0001"));
+        parser.parse(getBytes("8=FIX.4.4\u000122=2\u0001"));
+        parser.parse(getBytes("8=FIX.4.4\u000122=3\u0001"));
+        parser.parse(getBytes("8=FIX.4.4\u000122=4\u0001"));
+        parser.parse(getBytes("8=FIX.4.4\u000122=5\u000110=001\u0001"));
+        parser.parse(getBytes("8=FIX.4.4\u000122=6\u0001"));
+
+        assertEquals("6", toString(parser.getByteValueForTag(22)));
+        assertNull(parser.getByteValueForTag(10));
     }
 
     /*
