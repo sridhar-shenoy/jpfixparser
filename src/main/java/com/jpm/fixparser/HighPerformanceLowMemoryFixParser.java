@@ -1,7 +1,6 @@
 package com.jpm.fixparser;
 
 
-import com.jpm.exception.ErrorMessages;
 import com.jpm.exception.MalformedFixMessageException;
 
 import java.util.Arrays;
@@ -44,10 +43,13 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
         for (int i = 0; i < msg.length; i++) {
             if (parsingNextTag) {
                 if (msg[i] == '=') {
-                    //-- Link parsed fix tag to its lookup Index
+
+                    //-- Ensure we have a valid Fix Tag
                     if (fixTag <= 0 || fixTag > maxNumberOfFixTagsSupported) {
                         throw new MalformedFixMessageException(MISSING_TAG);
                     }
+
+                    //-- Link parsed fix tag to its lookup Index
                     fixTags[currentTagIndex] = fixTag;
                     tagLookupIndices[fixTag] = currentTagIndex;
 
@@ -60,6 +62,8 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
                 } else {
                     //-- Convert the fixTag to integer here
                     fixTag = fixTag * 10 + (msg[i] - '0');
+
+                    //-- Check if fixTag is valid
                     if (fixTag <= 0 || fixTag > maxNumberOfFixTagsSupported) {
                         throw new MalformedFixMessageException(MISSING_TAG);
                     }
@@ -67,8 +71,10 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
             } else {
                 //-- keep moving currentTagIndex until we reach the agreed delimiter
                 if (msg[i] == delimiter) {
-                    //-- i - previously recorded Starting position of the value is the length of the value
+                    //-- (i - previously recorded Starting position of the value ) is the length of the value
                     int valueLength = i - valueIndexLengthMatrix[currentTagIndex][0];
+
+                    //-- Ensure we have a valid value
                     if (valueLength == 0) {
                         throw new MalformedFixMessageException(MISSING_VALUE);
                     }
