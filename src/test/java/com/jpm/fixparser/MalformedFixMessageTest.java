@@ -1,7 +1,6 @@
 package com.jpm.fixparser;
 
 import com.jpm.exception.MalformedFixMessageException;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

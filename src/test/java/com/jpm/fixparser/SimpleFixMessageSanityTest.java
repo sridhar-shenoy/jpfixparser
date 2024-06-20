@@ -49,9 +49,18 @@ public class SimpleFixMessageSanityTest extends FixMessageTestBase {
         assertEquals("092", pipeDelimitedParser.getStringValueForTag(10));
     }
 
+    @Test
+    public void parserMustNotStoreStatesFromPreviousRun() throws MalformedFixMessageException {
+        parser.parse(getBytes("8=FIX.4.4\u000121=1\u0001"));
+        parser.parse(getBytes("8=FIX.4.4\u000122=2\u0001"));
+
+        assertEquals("", toString(parser.getByteValueForTag(21)));
+
+    }
+
     /*
-       Randomized tests for Text parsing
-     */
+           Randomized tests for Text parsing
+         */
     @Test
     public void parseExtraLongTextMessage() throws MalformedFixMessageException {
         String randomLongString = randomLongString();
