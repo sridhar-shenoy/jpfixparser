@@ -1,13 +1,12 @@
 package com.jpm.fixparser;
 
 
-
+import com.jpm.exception.ErrorMessages;
 import com.jpm.exception.MalformedFixMessageException;
 
 import java.util.Arrays;
 
-import static com.jpm.exception.ErrorMessages.MISSING_DELIMITER;
-import static com.jpm.exception.ErrorMessages.MISSING_TAG;
+import static com.jpm.exception.ErrorMessages.*;
 
 public class HighPerformanceLowMemoryFixParser implements Parsable {
 
@@ -21,9 +20,6 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
     private int currentTagIndex;
 
     /**
-     *
-     *
-     *
      * @param maxNumberOfTagValuePairPerMessage
      * @param maxNumberOfFixTagsSupported
      * @param delimiter
@@ -49,7 +45,7 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
             if (parsingNextTag) {
                 if (msg[i] == '=') {
                     //-- Link parsed fix tag to its lookup Index
-                    if(fixTag <= 0 || fixTag > maxNumberOfFixTagsSupported) {
+                    if (fixTag <= 0 || fixTag > maxNumberOfFixTagsSupported) {
                         throw new MalformedFixMessageException(MISSING_TAG);
                     }
                     fixTags[currentTagIndex] = fixTag;
@@ -64,12 +60,19 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
                 } else {
                     //-- Convert the fixTag to integer here
                     fixTag = fixTag * 10 + (msg[i] - '0');
+                    if (fixTag <= 0 || fixTag > maxNumberOfFixTagsSupported) {
+                        throw new MalformedFixMessageException(MISSING_TAG);
+                    }
                 }
             } else {
                 //-- keep moving currentTagIndex until we reach the agreed delimiter
                 if (msg[i] == delimiter) {
                     //-- i - previously recorded Starting position of the value is the length of the value
-                    valueIndexLengthMatrix[currentTagIndex][1] = i - valueIndexLengthMatrix[currentTagIndex][0];
+                    int valueLength = i - valueIndexLengthMatrix[currentTagIndex][0];
+                    if (valueLength == 0) {
+                        throw new MalformedFixMessageException(MISSING_VALUE);
+                    }
+                    valueIndexLengthMatrix[currentTagIndex][1] = valueLength;
                     currentTagIndex++;
                     //-- Reset values to parse the next Tag Value Pair
                     parsingNextTag = true;
@@ -78,8 +81,8 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
                 }
             }
         }
-        if(parsedValue == false){
-            throw  new MalformedFixMessageException(MISSING_DELIMITER);
+        if (parsedValue == false) {
+            throw new MalformedFixMessageException(MISSING_DELIMITER);
         }
     }
 
@@ -88,7 +91,6 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
     }
 
     /**
-     *
      * @param tag
      * @return
      */
