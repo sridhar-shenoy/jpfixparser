@@ -1,6 +1,5 @@
 package com.jpm.fixparser;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -27,6 +26,27 @@ public class SimpleFixMessageSanityTest extends FixMessageTestBase {
         assertEquals("092", toString(parser.getByteValueForTag(10)));
     }
 
+    @Test
+    public void parseSimpleFixMessageWithDifferentDelimiterForByteValues() {
+        HighPerformanceLowMemoryFixParser pipeDelimitedParser = new HighPerformanceLowMemoryFixParser(1000,1000,'|');
+        pipeDelimitedParser.parse(getBytes("8=FIX.4.4|9=148|35=D|34=1080|10=092|"));
+
+        assertEquals("FIX.4.4", toString(pipeDelimitedParser.getByteValueForTag(8)));
+        assertEquals("148", toString(pipeDelimitedParser.getByteValueForTag(9)));
+        assertEquals("D", toString(pipeDelimitedParser.getByteValueForTag(35)));
+        assertEquals("092", toString(pipeDelimitedParser.getByteValueForTag(10)));
+    }
+
+    @Test
+    public void parseSimpleFixMessageWithDifferentDelimiterForStringValues() {
+        HighPerformanceLowMemoryFixParser pipeDelimitedParser = new HighPerformanceLowMemoryFixParser(1000,1000,'|');
+        pipeDelimitedParser.parse(getBytes("8=FIX.4.4|9=148|35=D|34=1080|10=092|"));
+
+        assertEquals("FIX.4.4", pipeDelimitedParser.getStringValueForTag(8));
+        assertEquals("148", pipeDelimitedParser.getStringValueForTag(9));
+        assertEquals("D", pipeDelimitedParser.getStringValueForTag(35));
+        assertEquals("092", pipeDelimitedParser.getStringValueForTag(10));
+    }
 
     /*
        Randomized tests for Text parsing
