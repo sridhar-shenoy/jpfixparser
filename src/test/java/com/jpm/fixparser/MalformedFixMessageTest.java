@@ -33,5 +33,4 @@ public class MalformedFixMessageTest extends FixMessageTestBase {
             assertEquals("Unable to parse fix message due to malformed tag value pair", e.getMessage());
         }
     }
-
 }

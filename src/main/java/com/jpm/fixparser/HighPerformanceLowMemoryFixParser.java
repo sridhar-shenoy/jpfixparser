@@ -1,9 +1,8 @@
 package com.jpm.fixparser;
 
 
-import com.jpm.exception.ErrorMessages;
+
 import com.jpm.exception.MalformedFixMessageException;
-import com.sun.istack.internal.Nullable;
 
 import java.util.Arrays;
 
@@ -93,7 +92,6 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
      * @param tag
      * @return
      */
-    @Nullable
     public byte[] getByteValueForTag(int tag) {
         int index = tagLookupIndices[tag];
         if (index != -1) {
