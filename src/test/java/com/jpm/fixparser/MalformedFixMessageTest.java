@@ -80,5 +80,6 @@ public class MalformedFixMessageTest extends FixMessageTestBase {
         parser.parse(getBytes("8=FIX.4.4\u000158=恭喜發財\u0001"));
         String stringValueForTag = parser.getStringValueForTag(58);
         assertEquals("恭喜發財", stringValueForTag);
+
     }
 }
