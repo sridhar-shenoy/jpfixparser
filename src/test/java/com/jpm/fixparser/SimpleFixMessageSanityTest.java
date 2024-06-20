@@ -59,8 +59,8 @@ public class SimpleFixMessageSanityTest extends FixMessageTestBase {
     }
 
     /*
-           Randomized tests for Text parsing
-         */
+      Randomized tests for Text parsing
+    */
     @Test
     public void parseExtraLongTextMessage() throws MalformedFixMessageException {
         String randomLongString = randomLongString();
