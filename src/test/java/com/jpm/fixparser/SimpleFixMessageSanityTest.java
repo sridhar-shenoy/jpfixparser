@@ -1,5 +1,6 @@
 package com.jpm.fixparser;
 
+import com.jpm.exception.MalformedFixMessageException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -7,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 public class SimpleFixMessageSanityTest extends FixMessageTestBase {
 
     @Test
-    public void parseSimpleFixMessageForStringValues() {
+    public void parseSimpleFixMessageForStringValues() throws MalformedFixMessageException {
         parser.parse(getBytes("8=FIX.4.4\u00019=148\u000135=D\u000134=1080\u000110=092\u0001"));
 
         assertEquals("FIX.4.4", parser.getStringValueForTag(8));
@@ -17,7 +18,7 @@ public class SimpleFixMessageSanityTest extends FixMessageTestBase {
     }
 
     @Test
-    public void parseSimpleFixMessageForByteValues() {
+    public void parseSimpleFixMessageForByteValues() throws MalformedFixMessageException {
         parser.parse(getBytes("8=FIX.4.4\u00019=148\u000135=D\u000134=1080\u000110=092\u0001"));
 
         assertEquals("FIX.4.4", toString(parser.getByteValueForTag(8)));
@@ -27,7 +28,7 @@ public class SimpleFixMessageSanityTest extends FixMessageTestBase {
     }
 
     @Test
-    public void parseSimpleFixMessageWithDifferentDelimiterForByteValues() {
+    public void parseSimpleFixMessageWithDifferentDelimiterForByteValues() throws MalformedFixMessageException {
         HighPerformanceLowMemoryFixParser pipeDelimitedParser = new HighPerformanceLowMemoryFixParser(1000,1000,'|');
         pipeDelimitedParser.parse(getBytes("8=FIX.4.4|9=148|35=D|34=1080|10=092|"));
 
@@ -38,7 +39,7 @@ public class SimpleFixMessageSanityTest extends FixMessageTestBase {
     }
 
     @Test
-    public void parseSimpleFixMessageWithDifferentDelimiterForStringValues() {
+    public void parseSimpleFixMessageWithDifferentDelimiterForStringValues() throws MalformedFixMessageException {
         HighPerformanceLowMemoryFixParser pipeDelimitedParser = new HighPerformanceLowMemoryFixParser(1000,1000,'|');
         pipeDelimitedParser.parse(getBytes("8=FIX.4.4|9=148|35=D|34=1080|10=092|"));
 
@@ -52,11 +53,10 @@ public class SimpleFixMessageSanityTest extends FixMessageTestBase {
        Randomized tests for Text parsing
      */
     @Test
-    public void parseExtraLongTextMessage() {
+    public void parseExtraLongTextMessage() throws MalformedFixMessageException {
         String randomLongString = randomLongString();
         parser.parse(getBytes("8=FIX.4.4\u00019=148\u000135=D\u000134=1080\u000158=" + randomLongString + "\u000110=092\u0001"));
         assertEquals(randomLongString, parser.getStringValueForTag(58));
     }
-
 
 }

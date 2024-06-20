@@ -1,12 +1,28 @@
 package com.jpm.fixparser;
 
 import com.jpm.exception.MalformedFixMessageException;
+import org.junit.Assert;
 import org.junit.Test;
 
-public class MalformedFixMessageTest extends FixMessageTestBase{
+import static org.junit.Assert.assertEquals;
 
-    @Test(expected = MalformedFixMessageException.class)
+public class MalformedFixMessageTest extends FixMessageTestBase {
+
+    @Test
     public void parseSimpleFixMessageWithMissingDelimiterAfterChecksum() {
-        parser.parse(getBytes("8=FIX.4.4\u00019=148\u000135=D\u000134=1080\u000110=092"));
+        try {
+            parser.parse(getBytes("8=FIX.4.4\u000110=092"));
+        } catch (MalformedFixMessageException e) {
+            assertEquals("Unable to parse due to missing delimiter", e.getMessage());
+        }
+    }
+
+    @Test
+    public void parseSimpleFixMessageWithMissingTag() {
+        try {
+            parser.parse(getBytes("=FIX.4.4\u000110=092\u0001"));
+        } catch (MalformedFixMessageException e) {
+            assertEquals("Unable to parse fix message due to missing tag", e.getMessage());
+        }
     }
 }

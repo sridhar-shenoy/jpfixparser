@@ -1,13 +1,21 @@
 package com.jpm.fixparser;
 
 
+import com.jpm.exception.ErrorMessages;
+import com.jpm.exception.MalformedFixMessageException;
+
 import java.util.Arrays;
+
+import static com.jpm.exception.ErrorMessages.MISSING_DELIMITER;
+import static com.jpm.exception.ErrorMessages.MISSING_TAG;
 
 public class HighPerformanceLowMemoryFixParser implements Parsable {
 
+    private int maxNumberOfFixTagsSupported;
     private final char delimiter;
     private byte[] rawFixMessage;
     private final int[] fixTags;
+    private int maxNumberOfTagValuePairPerMessage;
     private final int[] tagLookupIndices;
     private final int[][] valueIndexLengthMatrix;
     private int currentTagIndex;
@@ -22,22 +30,28 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
      */
     public HighPerformanceLowMemoryFixParser(int maxNumberOfTagValuePairPerMessage, int maxNumberOfFixTagsSupported, char delimiter) {
         this.fixTags = new int[maxNumberOfTagValuePairPerMessage / 2];
+        this.maxNumberOfTagValuePairPerMessage = maxNumberOfTagValuePairPerMessage;
         this.tagLookupIndices = new int[maxNumberOfFixTagsSupported];
         this.valueIndexLengthMatrix = new int[maxNumberOfTagValuePairPerMessage / 2][2];
+        this.maxNumberOfFixTagsSupported = maxNumberOfFixTagsSupported;
         this.delimiter = delimiter;
     }
 
-    public void parse(byte[] msg) {
+    public void parse(byte[] msg) throws MalformedFixMessageException {
         this.rawFixMessage = msg;
         Arrays.fill(this.tagLookupIndices, -1);
         this.currentTagIndex = 0;
         int fixTag = 0;
-        boolean parsingTag = true;
+        boolean parsingNextTag = true;
+        boolean parsedValue = false;
 
         for (int i = 0; i < msg.length; i++) {
-            if (parsingTag) {
+            if (parsingNextTag) {
                 if (msg[i] == '=') {
                     //-- Link parsed fix tag to its lookup Index
+                    if(fixTag == 0 || fixTag > maxNumberOfFixTagsSupported) {
+                        throw new MalformedFixMessageException(MISSING_TAG);
+                    }
                     fixTags[currentTagIndex] = fixTag;
                     tagLookupIndices[fixTag] = currentTagIndex;
 
@@ -45,7 +59,8 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
                     valueIndexLengthMatrix[currentTagIndex][0] = i + 1;
 
                     //-- Now that Tag is parsed, we enable the flag to parse its corresponding value
-                    parsingTag = false;
+                    parsingNextTag = false;
+                    parsedValue = false;
                 } else {
                     //-- Convert the fixTag to integer here
                     fixTag = fixTag * 10 + (msg[i] - '0');
@@ -57,11 +72,14 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
                     valueIndexLengthMatrix[currentTagIndex][1] = i - valueIndexLengthMatrix[currentTagIndex][0];
                     currentTagIndex++;
                     //-- Reset values to parse the next Tag Value Pair
-                    parsingTag = true;
+                    parsingNextTag = true;
+                    parsedValue = true;
                     fixTag = 0;
                 }
-
             }
+        }
+        if(parsedValue == false){
+            throw  new MalformedFixMessageException(MISSING_DELIMITER);
         }
     }
 
