@@ -1,6 +1,6 @@
-package com.jpm.fixparser;
+package com.jpm.interfacce;
 
-public interface Parsable {
+public interface FixMessageReadable {
     String getStringValueForTag(int tag);
     byte[] getByteValueForTag(int tag);
 }

@@ -2,12 +2,14 @@ package com.jpm.fixparser;
 
 
 import com.jpm.exception.MalformedFixMessageException;
+import com.jpm.interfacce.FixMessageParsable;
+import com.jpm.interfacce.FixMessageReadable;
 
 import java.util.Arrays;
 
 import static com.jpm.exception.ErrorMessages.*;
 
-public final class HighPerformanceLowMemoryFixParser implements Parsable {
+public final class HighPerformanceLowMemoryFixParser implements FixMessageReadable, FixMessageParsable {
 
     private final int maxNumberOfFixTagsSupported;
     private final char delimiter;
@@ -30,6 +32,7 @@ public final class HighPerformanceLowMemoryFixParser implements Parsable {
         this.delimiter = delis;
     }
 
+    @Override
     public void parse(byte[] msg) throws MalformedFixMessageException {
         if (msg == null) {
             throwException(NULL_MESSAGE);
