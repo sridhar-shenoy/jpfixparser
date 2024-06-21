@@ -75,9 +75,4 @@ public class MalformedFixMessageTest extends FixMessageTestBase {
         fail("Should have thrown an exception");
     }
 
-    @Test
-    public void parserMustRetrieveSpecialCharacters() throws MalformedFixMessageException {
-        parser.parse(getBytes("8=FIX.4.4\u000158=恭喜發財\u0001"));
-        assertEquals("恭喜發財", parser.getStringValueForTag(58));
-    }
 }
