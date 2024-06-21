@@ -2,34 +2,36 @@ package com.jpm.fixparser;
 
 
 import com.jpm.exception.MalformedFixMessageException;
-import com.jpm.interfacce.FixMessageParsable;
-import com.jpm.interfacce.FixMessageReadable;
+import com.jpm.interfacce.FixMessageParser;
+import com.jpm.interfacce.FixTagAccessor;
+import com.jpm.policy.DefaultPolicy;
 
 import java.util.Arrays;
 
 import static com.jpm.exception.ErrorMessages.*;
 
-public final class HighPerformanceLowMemoryFixParser implements FixMessageReadable, FixMessageParsable {
+public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, FixMessageParser {
 
-    private final int maxNumberOfFixTagsSupported;
     private final char delimiter;
     private byte[] rawFixMessage;
     private final int[] fixTags;
     private final int[] tagLookupIndices;
+    private final DefaultPolicy defaultPolicy;
+    private final int[] repeatingGroupLookupIndices;
     private final int[][] valueIndexLengthMatrix;
     private int currentTagIndex;
 
     /**
-     * @param maxNumberOfTagValuePairPerMessage
-     * @param maxFixTagSupported
-     * @param delis
+     * @param defaultPolicy
      */
-    public HighPerformanceLowMemoryFixParser(int maxNumberOfTagValuePairPerMessage, int maxFixTagSupported, char delis) {
-        this.fixTags = new int[maxNumberOfTagValuePairPerMessage / 2];
-        this.tagLookupIndices = new int[maxFixTagSupported];
-        this.valueIndexLengthMatrix = new int[maxNumberOfTagValuePairPerMessage / 2][2];
-        this.maxNumberOfFixTagsSupported = maxFixTagSupported;
-        this.delimiter = delis;
+    public HighPerformanceLowMemoryFixParser(DefaultPolicy defaultPolicy) {
+        this.fixTags = new int[defaultPolicy.getMaxNumberOfTagValuePairPerMessage()];
+        this.tagLookupIndices = new int[defaultPolicy.getMaxFixTagSupported()];
+        this.defaultPolicy = defaultPolicy;
+        this.repeatingGroupLookupIndices = new int[100];
+        this.valueIndexLengthMatrix = new int[defaultPolicy.getMaxNumberOfTagValuePairPerMessage()][2];
+        this.delimiter = defaultPolicy.getFixDelimiter();
+        this.rawFixMessage = new byte[defaultPolicy.maxLengthOfFixMessage()];
     }
 
     @Override
@@ -37,7 +39,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixMessageReadab
         if (msg == null) {
             throwException(NULL_MESSAGE);
         }
-        this.rawFixMessage = msg;
+        System.arraycopy(msg, 0, rawFixMessage, 0, msg.length);
         Arrays.fill(this.tagLookupIndices, -1);
         this.currentTagIndex = 0;
         int fixTag = 0;
@@ -49,7 +51,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixMessageReadab
                 if (msg[i] == '=') {
 
                     //-- Ensure we have a valid Fix Tag
-                    if (fixTag <= 0 || fixTag > maxNumberOfFixTagsSupported) {
+                    if (fixTag <= 0 || fixTag > defaultPolicy.getMaxFixTagSupported()) {
                         throwException(MALFORMED_TAG_VALUE_PAIR);
                     }
 
@@ -68,7 +70,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixMessageReadab
                     fixTag = (fixTag * 10) + (msg[i] - '0');
 
                     //-- Check if fixTag is valid
-                    if (fixTag <= 0 || fixTag > maxNumberOfFixTagsSupported) {
+                    if (fixTag <= 0 || fixTag > defaultPolicy.getMaxFixTagSupported()) {
                         throwException(MALFORMED_TAG_VALUE_PAIR);
                     }
                 }

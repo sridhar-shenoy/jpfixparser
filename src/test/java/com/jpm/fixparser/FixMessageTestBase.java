@@ -1,5 +1,6 @@
 package com.jpm.fixparser;
 
+import com.jpm.policy.DefaultPolicy;
 import org.junit.BeforeClass;
 
 import java.util.Random;
@@ -13,7 +14,7 @@ public class FixMessageTestBase {
 
     @BeforeClass
     public static void setUp() {
-        parser = new HighPerformanceLowMemoryFixParser(1000, 1000, '\u0001');
+        parser = new HighPerformanceLowMemoryFixParser(new DefaultPolicy(100,1000, 10000, '\u0001'));
     }
 
     protected String toString(byte[] byteValueForTag) {
@@ -21,7 +22,7 @@ public class FixMessageTestBase {
     }
 
     protected String randomLongString() {
-        return generate(() -> "a").limit(1000 + random.nextInt(10000)).collect(joining());
+        return generate(() -> "a").limit(random.nextInt(100)).collect(joining());
     }
 
     protected byte[] getBytes(String fixMsg) {

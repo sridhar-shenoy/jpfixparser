@@ -1,6 +1,6 @@
 package com.jpm.interfacce;
 
-public interface FixMessageReadable {
+public interface FixTagAccessor {
     String getStringValueForTag(int tag);
     byte[] getByteValueForTag(int tag);
 }
