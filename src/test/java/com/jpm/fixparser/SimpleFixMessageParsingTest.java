@@ -82,4 +82,14 @@ public class SimpleFixMessageParsingTest extends FixMessageTestBase {
         assertEquals(randomLongString, parser.getStringValueForTag(58));
     }
 
+    @Test
+    public void inputFixMessageCaneBeMutatedAfterParsing() throws MalformedFixMessageException {
+        byte[] bytes = getBytes("8=FIX.4.4\u000121=1\u0001");
+        parser.parse(bytes);
+        bytes[0] = '\u0001';
+        bytes[1] = '\u0001';
+        assertEquals("FIX.4.4", toString(parser.getByteValueForTag(8)));
+        assertNull(parser.getByteValueForTag(10));
+    }
+
 }

@@ -32,7 +32,7 @@ public class DefaultPolicy implements Conformable {
         fixRepeatingGroupLookupMap.put(453, Arrays.asList(448, 457, 442, 2367));
     }
 
-    @Override
+     @Override
     public int getMaxNumberOfTagValuePairPerMessage() {
         return maxNumberOfTagValuePairPerMessage;
     }

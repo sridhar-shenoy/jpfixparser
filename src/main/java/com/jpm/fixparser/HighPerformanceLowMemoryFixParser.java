@@ -22,16 +22,16 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
     private int currentTagIndex;
 
     /**
-     * @param defaultPolicy
+     * @param policy
      */
-    public HighPerformanceLowMemoryFixParser(DefaultPolicy defaultPolicy) {
-        this.fixTags = new int[defaultPolicy.getMaxNumberOfTagValuePairPerMessage()];
-        this.tagLookupIndices = new int[defaultPolicy.getMaxFixTagSupported()];
-        this.defaultPolicy = defaultPolicy;
+    public HighPerformanceLowMemoryFixParser(DefaultPolicy policy) {
+        this.fixTags = new int[policy.getMaxNumberOfTagValuePairPerMessage()];
+        this.tagLookupIndices = new int[policy.getMaxFixTagSupported()];
+        this.defaultPolicy = policy;
         this.repeatingGroupLookupIndices = new int[100];
-        this.valueIndexLengthMatrix = new int[defaultPolicy.getMaxNumberOfTagValuePairPerMessage()][2];
-        this.delimiter = defaultPolicy.getFixDelimiter();
-        this.rawFixMessage = new byte[defaultPolicy.maxLengthOfFixMessage()];
+        this.valueIndexLengthMatrix = new int[policy.getMaxNumberOfTagValuePairPerMessage()][2];
+        this.delimiter = policy.getFixDelimiter();
+        this.rawFixMessage = new byte[policy.maxLengthOfFixMessage()];
     }
 
     @Override
