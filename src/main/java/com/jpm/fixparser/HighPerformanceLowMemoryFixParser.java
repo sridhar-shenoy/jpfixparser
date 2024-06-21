@@ -7,32 +7,33 @@ import java.util.Arrays;
 
 import static com.jpm.exception.ErrorMessages.*;
 
-public class HighPerformanceLowMemoryFixParser implements Parsable {
+public final class HighPerformanceLowMemoryFixParser implements Parsable {
 
-    private int maxNumberOfFixTagsSupported;
+    private final int maxNumberOfFixTagsSupported;
     private final char delimiter;
     private byte[] rawFixMessage;
     private final int[] fixTags;
-    private int maxNumberOfTagValuePairPerMessage;
     private final int[] tagLookupIndices;
     private final int[][] valueIndexLengthMatrix;
     private int currentTagIndex;
 
     /**
      * @param maxNumberOfTagValuePairPerMessage
-     * @param maxNumberOfFixTagsSupported
-     * @param delimiter
+     * @param maxFixTagSupported
+     * @param delis
      */
-    public HighPerformanceLowMemoryFixParser(int maxNumberOfTagValuePairPerMessage, int maxNumberOfFixTagsSupported, char delimiter) {
+    public HighPerformanceLowMemoryFixParser(int maxNumberOfTagValuePairPerMessage, int maxFixTagSupported, char delis) {
         this.fixTags = new int[maxNumberOfTagValuePairPerMessage / 2];
-        this.maxNumberOfTagValuePairPerMessage = maxNumberOfTagValuePairPerMessage;
-        this.tagLookupIndices = new int[maxNumberOfFixTagsSupported];
+        this.tagLookupIndices = new int[maxFixTagSupported];
         this.valueIndexLengthMatrix = new int[maxNumberOfTagValuePairPerMessage / 2][2];
-        this.maxNumberOfFixTagsSupported = maxNumberOfFixTagsSupported;
-        this.delimiter = delimiter;
+        this.maxNumberOfFixTagsSupported = maxFixTagSupported;
+        this.delimiter = delis;
     }
 
     public void parse(byte[] msg) throws MalformedFixMessageException {
+        if (msg == null) {
+            throwException(NULL_MESSAGE);
+        }
         this.rawFixMessage = msg;
         Arrays.fill(this.tagLookupIndices, -1);
         this.currentTagIndex = 0;
@@ -46,7 +47,7 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
 
                     //-- Ensure we have a valid Fix Tag
                     if (fixTag <= 0 || fixTag > maxNumberOfFixTagsSupported) {
-                        throw new MalformedFixMessageException(MISSING_TAG);
+                        throwException(MALFORMED_TAG_VALUE_PAIR);
                     }
 
                     //-- Link parsed fix tag to its lookup Index
@@ -61,11 +62,11 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
                     parsedValue = false;
                 } else {
                     //-- Convert the fixTag to integer here
-                    fixTag = fixTag * 10 + (msg[i] - '0');
+                    fixTag = (fixTag * 10) + (msg[i] - '0');
 
                     //-- Check if fixTag is valid
                     if (fixTag <= 0 || fixTag > maxNumberOfFixTagsSupported) {
-                        throw new MalformedFixMessageException(MISSING_TAG);
+                        throwException(MALFORMED_TAG_VALUE_PAIR);
                     }
                 }
             } else {
@@ -76,7 +77,7 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
 
                     //-- Ensure we have a valid value
                     if (valueLength == 0) {
-                        throw new MalformedFixMessageException(MISSING_VALUE);
+                        throwException(MISSING_VALUE);
                     }
                     valueIndexLengthMatrix[currentTagIndex][1] = valueLength;
                     currentTagIndex++;
@@ -87,9 +88,14 @@ public class HighPerformanceLowMemoryFixParser implements Parsable {
                 }
             }
         }
-        if (parsedValue == false) {
-            throw new MalformedFixMessageException(MISSING_DELIMITER);
+
+        if (!parsedValue) {
+            throwException(MISSING_DELIMITER);
         }
+    }
+
+    private static void throwException(String missingTag) throws MalformedFixMessageException {
+        throw new MalformedFixMessageException(missingTag);
     }
 
     public String getStringValueForTag(int tag) {

@@ -25,7 +25,7 @@ public class FixMessageTestBase {
     }
 
     protected byte[] getBytes(String fixMsg) {
-        return fixMsg.getBytes();
+        return fixMsg != null ? fixMsg.getBytes() : null;
     }
 
 }
