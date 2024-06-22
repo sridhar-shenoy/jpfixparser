@@ -2,7 +2,9 @@ package com.jpm.fixparser;
 
 import com.jpm.interfacce.Conformable;
 
-public class FixMessageIndexer {
+import java.util.Arrays;
+
+public final class FixMessageIndexer {
     private final int[] tagLookupIndices;
 
     /*
@@ -15,7 +17,7 @@ public class FixMessageIndexer {
     Colum 1 = length of the tag Value
      */
     private final int[][] valueIndexLengthMatrix;
-    int currentTagIndex = 0;
+    private int currentTagIndex = 0;
 
     public FixMessageIndexer(Conformable policy) {
         this.tagLookupIndices = new int[policy.getMaxFixTagSupported()];
@@ -49,4 +51,7 @@ public class FixMessageIndexer {
         return valueIndexLengthMatrix[getIndexForTag(tag)][1];
     }
 
+    public void reset() {
+        Arrays.fill(this.tagLookupIndices, -1);
+    }
 }

@@ -6,8 +6,6 @@ import com.jpm.interfacce.Conformable;
 import com.jpm.interfacce.FixMessageParser;
 import com.jpm.interfacce.FixTagAccessor;
 
-import java.util.Arrays;
-
 import static com.jpm.exception.ErrorMessages.*;
 
 public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, FixMessageParser {
@@ -15,28 +13,6 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
     private final Conformable policy;
     private final char delimiter;
     private byte[] rawFixMessage;
-
-    private final int[] tagLookupIndices;
-
-    /*
-    Colum 0 = fix tag number
-     */
-    private final int[] fixTags;
-
-    /*
-    Colum 0 = tagIndex from fixTags[],
-    Colum 1 = length of the tag Value
-     */
-    private final int[][] valueIndexLengthMatrix;
-
-    /*
-    Colum 0 = repeatingGroup fix tag number ,
-    Colum 1 = repeatingGroup fix tag number's occurrence index  within the repeat group
-    Colum 2 = repeatingGroup fix tag number's occurrence index  within fix message
-     */
-
-    private int currentTagIndex;
-
     private final FixMessageIndexer indexer;
 
     /**
@@ -47,11 +23,6 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         this.delimiter = policy.getFixDelimiter();
         this.rawFixMessage = new byte[policy.maxLengthOfFixMessage()];
         indexer = new FixMessageIndexer(policy);
-
-        this.tagLookupIndices = new int[policy.getMaxFixTagSupported()];
-
-        this.fixTags = new int[policy.getMaxNumberOfTagValuePairPerMessage()];
-        this.valueIndexLengthMatrix = new int[policy.getMaxNumberOfTagValuePairPerMessage()][2];
     }
 
     @Override
@@ -60,8 +31,8 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
             throwException(NULL_MESSAGE);
         }
         System.arraycopy(msg, 0, rawFixMessage, 0, msg.length);
-        Arrays.fill(this.tagLookupIndices, -1);
-        this.currentTagIndex = 0;
+        indexer.reset();
+        int currentTagIndex = 0;
         int fixTag = 0;
         boolean parsingNextTag = true;
         boolean parsedValue = false;
@@ -76,11 +47,11 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                     }
 
                     //-- Link parsed fix tag to its lookup Index
-                    fixTags[currentTagIndex] = fixTag;
-                    tagLookupIndices[fixTag] = currentTagIndex;
+                    currentTagIndex = indexer.addTag(fixTag);
 
                     //-- Record the Starting position of the value of this tag
-                    valueIndexLengthMatrix[currentTagIndex][0] = i + 1;
+                    indexer.addValueIndex(currentTagIndex,i+1);
+
 
                     //-- Now that Tag is parsed, we enable the flag to parse its corresponding value
                     parsingNextTag = false;
@@ -98,14 +69,13 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                 //-- keep moving currentTagIndex until we reach the agreed delimiter
                 if (msg[i] == delimiter) {
                     //-- (i - previously recorded Starting position of the value ) is the length of the value
-                    int valueLength = i - valueIndexLengthMatrix[currentTagIndex][0];
+                    int valueLength = i - indexer.getValueIndexForTag(fixTag);
 
                     //-- Ensure we have a valid value
                     if (valueLength == 0) {
                         throwException(MISSING_VALUE);
                     }
-                    valueIndexLengthMatrix[currentTagIndex][1] = valueLength;
-                    currentTagIndex++;
+                    indexer.addValueLength(currentTagIndex,valueLength);
                     //-- Reset values to parse the next Tag Value Pair
                     parsingNextTag = true;
                     parsedValue = true;
@@ -132,10 +102,10 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
      * @return
      */
     public byte[] getByteValueForTag(int tag) {
-        int index = tagLookupIndices[tag];
+        int index = indexer.getIndexForTag(tag);
         if (index != -1) {
-            int start = valueIndexLengthMatrix[index][0];
-            int length = valueIndexLengthMatrix[index][1];
+            int start = indexer.getValueIndexForTag(tag);
+            int length = indexer.getValueLengthForTag(tag);
             byte[] value = new byte[length];
             System.arraycopy(rawFixMessage, start, value, 0, length);
             return value;
