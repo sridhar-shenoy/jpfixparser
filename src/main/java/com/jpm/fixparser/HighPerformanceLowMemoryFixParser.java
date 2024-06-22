@@ -13,7 +13,7 @@ import static com.jpm.exception.ErrorMessages.*;
 public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, FixMessageParser {
 
     private final char delimiter;
-    private byte[] rawFixMessage;
+
     private final FixMessageIndexer indexer;
     private final FixTag fixTag;
 
@@ -22,7 +22,6 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
      */
     public HighPerformanceLowMemoryFixParser(Conformable policy) {
         this.delimiter = policy.getFixDelimiter();
-        this.rawFixMessage = new byte[policy.maxLengthOfFixMessage()];
         indexer = new FixMessageIndexer(policy);
         fixTag = new FixTag(policy.getMaxFixTagSupported());
     }
@@ -38,7 +37,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         boolean parsingNextTag = true;
         boolean parsedValue = false;
 
-        for (int i = 0; i < msg.length; i++) {
+        for (int i = 0; i < indexer.getMessageLength(); i++) {
             if (parsingNextTag) {
                 if (msg[i] == '=') {
                     //-- At this point we have FixTag constructed. Index it and update flags
@@ -92,19 +91,14 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
     }
 
     private void initializeInternalCache(byte[] msg) {
-        copyToLocalCache(msg);
-        indexer.reset();
         fixTag.reset();
+        indexer.copyToLocalCache(msg);
     }
 
     private void validateFixTag(String errorTest) throws MalformedFixMessageException {
         if (fixTag.isInvalid()) {
             throwException(errorTest);
         }
-    }
-
-    private void copyToLocalCache(byte[] msg) {
-        System.arraycopy(msg, 0, rawFixMessage, 0, msg.length);
     }
 
     private static void throwException(String missingTag) throws MalformedFixMessageException {
@@ -120,14 +114,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
      * @return
      */
     public byte[] getByteValueForTag(int tag) {
-        int index = indexer.getIndexForTag(tag);
-        if (index != -1) {
-            int start = indexer.getValueIndexForTag(tag);
-            int length = indexer.getValueLengthForTag(tag);
-            byte[] value = new byte[length];
-            System.arraycopy(rawFixMessage, start, value, 0, length);
-            return value;
-        }
-        return null;
+        return indexer.getByteValueForTag(tag);
     }
+
 }

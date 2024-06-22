@@ -18,11 +18,14 @@ public final class FixMessageIndexer {
      */
     private final int[][] valueIndexLengthMatrix;
     private int currentTagIndex = 0;
+    private byte[] rawFixMessage;
+    private int rawFixMessageLength;
 
     public FixMessageIndexer(Conformable policy) {
         this.tagLookupIndices = new int[policy.getMaxFixTagSupported()];
         this.fixTags = new int[policy.getMaxNumberOfTagValuePairPerMessage()];
         this.valueIndexLengthMatrix = new int[policy.getMaxNumberOfTagValuePairPerMessage()][2];
+        this.rawFixMessage = new byte[policy.maxLengthOfFixMessage()];
     }
 
     public int addTag(int tag) {
@@ -51,7 +54,29 @@ public final class FixMessageIndexer {
         return valueIndexLengthMatrix[getIndexForTag(tag)][1];
     }
 
-    public void reset() {
+    private void reset() {
         Arrays.fill(this.tagLookupIndices, -1);
+        rawFixMessageLength = 0;
+    }
+
+    public int getMessageLength() {
+        return rawFixMessageLength;
+    }
+
+    public void copyToLocalCache(byte[] msg) {
+        reset();
+        rawFixMessageLength = msg.length;
+        System.arraycopy(msg, 0, rawFixMessage, 0, rawFixMessageLength);
+    }
+
+    public byte[] getByteValueForTag(int tag) {
+        int index = getIndexForTag(tag);
+        if (index != -1) {
+            int length = getValueLengthForTag(tag);
+            byte[] value = new byte[length];
+            System.arraycopy(rawFixMessage, getValueIndexForTag(tag), value, 0, length);
+            return value;
+        }
+        return null;
     }
 }
