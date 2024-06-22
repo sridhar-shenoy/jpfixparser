@@ -74,9 +74,13 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                     //-- At this point we have FixTag constructed. Index it and update flags
 
                     int tag = fixTag.getTag();
+                    if (!dictionary.isTagMemberOfRepeatGroup(tag, repeatGroupBeginTag)) {
+                        inRepeatGroup = false;
+                    }
                     if (!inRepeatGroup && dictionary.isRepeatingGroupBeginTag(tag)) {
                         inRepeatGroup = true;
                         parsingRepeatingGroupCount = true;
+                        repeatGroupBeginTag = tag;
                         currentRepeatGroupTagIndex = repeatGroupIndexer.addBeginTagAndGetIndex(tag);
                         repeatGroupIndexer.addValueIndex(currentRepeatGroupTagIndex, i + 1);
                         lengthOfTagMemebers = dictionary.copyTagMembersOfRepeatGroupTo(tag, tagMembersOfRepeatGroup);
