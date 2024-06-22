@@ -66,6 +66,11 @@ public class DefaultPolicy implements Conformable {
         return new DefaultFixDictionary(this);
     }
 
+    @Override
+    public int maxNumberOfMemebersInRepeatingGroup() {
+        return 10;
+    }
+
     public static Conformable getDefaultPolicy(){
         return new DefaultPolicy(1000,1000,1000,'\u0001',100);
     }

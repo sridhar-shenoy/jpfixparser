@@ -2,16 +2,17 @@ package com.jpm.helper;
 
 import com.jpm.api.Conformable;
 
-public class RepeatingGroupHandler {
+public class RepeatingGroupHandler  {
     public static final int TAG_NUMBER = 0;
     public static final int TAG_OCCURENCE_WITHIN_GROUP = 1;
     public static final int REPEAT_GROUP_OCCURRENCE = 2;
-    public static final int VALUE_LENGTH = 3;
+    public static final int VALUE_INDEX = 3;
+    public static final int VALUE_LENGTH = 4;
     private final int[][] repeatingGroupOccurrenceIndex;
     private int currentArrayIndex = 0;
 
     public RepeatingGroupHandler(Conformable policy) {
-        repeatingGroupOccurrenceIndex = new int[policy.maxNumberOfRepeatingGroupAllowed()][4];
+        repeatingGroupOccurrenceIndex = new int[policy.maxNumberOfRepeatingGroupAllowed()][5];
     }
 
     public int getOccurrenceIndexWithinRepeatingGroup(int tag, int occurrenceIndexInMessage) {
@@ -60,7 +61,28 @@ public class RepeatingGroupHandler {
         repeatingGroupOccurrenceIndex[currentRepeatGroupTagIndex][VALUE_LENGTH] = valueLength;
     }
 
-    public int getValueIndexForTag(int currentTagIndex) {
-        return repeatingGroupOccurrenceIndex[currentTagIndex][VALUE_LENGTH];
+    public int getValueIndexForRepeatTagIndex(int currentTagIndex) {
+        return repeatingGroupOccurrenceIndex[currentTagIndex][VALUE_INDEX];
+    }
+
+
+    public int getIndexForTag(int tag, int instance, int instanceInMessage) {
+        for (int i = 0; i < currentArrayIndex; i++) {
+            if (repeatingGroupOccurrenceIndex[i][TAG_NUMBER] == tag
+                    && repeatingGroupOccurrenceIndex[i][TAG_OCCURENCE_WITHIN_GROUP] == instance
+                    && repeatingGroupOccurrenceIndex[i][REPEAT_GROUP_OCCURRENCE] == instanceInMessage
+            ) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public int getValueLengthForIndex(int index) {
+        return repeatingGroupOccurrenceIndex[index][VALUE_LENGTH];
+    }
+
+    public void addValueIndex(int index, int valueIndex) {
+        repeatingGroupOccurrenceIndex[index][VALUE_INDEX] = valueIndex;
     }
 }

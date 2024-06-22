@@ -7,4 +7,5 @@ public interface Conformable {
     int maxLengthOfFixMessage();
     int maxNumberOfRepeatingGroupAllowed();
     FixTagLookup dictionary();
+    int maxNumberOfMemebersInRepeatingGroup();
 }

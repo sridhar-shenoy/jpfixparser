@@ -17,7 +17,9 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
     private final FixMessageIndexer fixMessageIndexer;
     private final RepeatingGroupHandler repeatGroupIndexer;
     private final FixTag fixTag;
+    private final FixTag noOfRepeatGroupValue;
     private final FixTagLookup dictionary;
+    private final int[][] tagMembersOfRepeatGroup;
     /**
      *  incoming fix message must be copied to a local byte array
      *  length of this byte array is decided by the policy class
@@ -25,9 +27,10 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
     private byte[] rawFixMessage;
 
     /**
-     * This variable is set to length if the fixmessage currently being parsed
+     * This variable is set to length if the fix Message currently being parsed
      */
     private int rawFixMessageLength;
+    private int lengthOfTagMemebers = 0;
 
 
     /**
@@ -36,10 +39,12 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
     public HighPerformanceLowMemoryFixParser(Conformable policy) {
         delimiter = policy.delimiter();
         fixTag = new FixTag(policy);
+        noOfRepeatGroupValue = new FixTag(policy);
         fixMessageIndexer = new FixMessageIndexer(policy);
         repeatGroupIndexer = new RepeatingGroupHandler(policy);
         dictionary = policy.dictionary();
         rawFixMessage = new byte[policy.maxLengthOfFixMessage()];
+        tagMembersOfRepeatGroup = new int[policy.maxNumberOfMemebersInRepeatingGroup()][2];
     }
 
     @Override
@@ -48,6 +53,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
             throwException(NULL_MESSAGE);
         }
         fixTag.reset();
+        noOfRepeatGroupValue.reset();
         fixMessageIndexer.reset();
         rawFixMessageLength = msg.length;
         System.arraycopy(msg, 0, rawFixMessage, 0, rawFixMessageLength);
@@ -57,6 +63,10 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         boolean inRepeatGroup = false;
         boolean parsingNextTag = true;
         boolean parsedValue = false;
+        short countOfRepeatGroupParsed = 0;
+        boolean parsingRepeatingGroupCount = false;
+        int repeatGroupBeginTag = 0;
+
 
         for (int i = 0; i < rawFixMessageLength; i++) {
             if (parsingNextTag) {
@@ -64,9 +74,26 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                     //-- At this point we have FixTag constructed. Index it and update flags
 
                     int tag = fixTag.getTag();
-                    if (dictionary.isRepeatingGroupBeginTag(tag)) {
+                    if (!inRepeatGroup && dictionary.isRepeatingGroupBeginTag(tag)) {
                         inRepeatGroup = true;
+                        parsingRepeatingGroupCount = true;
                         currentRepeatGroupTagIndex = repeatGroupIndexer.addBeginTagAndGetIndex(tag);
+                        repeatGroupIndexer.addValueIndex(currentRepeatGroupTagIndex, i + 1);
+                        lengthOfTagMemebers = dictionary.copyTagMembersOfRepeatGroupTo(tag, tagMembersOfRepeatGroup);
+                    } else if(inRepeatGroup) {
+                        parsingRepeatingGroupCount = false;
+                        if(countOfRepeatGroupParsed == noOfRepeatGroupValue.getTag()){
+                            inRepeatGroup = false;
+                            countOfRepeatGroupParsed =0;
+                            noOfRepeatGroupValue.reset();
+                        }
+                        if(alreadyCheckedRepeatGroup(tag)){
+                            countOfRepeatGroupParsed++;
+                            resetRepeatingGroupMembers(tag);
+                        }
+                        currentRepeatGroupTagIndex = repeatGroupIndexer.addGroupMemberTagForRepeatBeginTag(tag, currentRepeatGroupTagIndex);
+                        repeatGroupIndexer.addValueIndex(currentRepeatGroupTagIndex, i + 1);
+                        unsetRepeatingMembers(tag);
                     } else {
                         currentTagIndex = addAndGetIndex(tag);
                         fixMessageIndexer.addValueIndex(currentTagIndex, i + 1);
@@ -76,12 +103,12 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
 
                 } else {
                     //-- At this point we are still constructing fixTag. Validate and continue parsing
-                    constructFixTag(msg[i]);
+                    parseNumber(rawFixMessage[i], fixTag);
                 }
             } else {
                 //-- keep moving currentTagIndex until we reach the agreed delimiter
                 if (isCharEquals(i, delimiter)) {
-                    int valueLength = i - (inRepeatGroup ? repeatGroupIndexer.getValueIndexForTag(currentTagIndex) : fixMessageIndexer.getValueIndexForTag(fixTag.getTag()));
+                    int valueLength = i - (inRepeatGroup ? repeatGroupIndexer.getValueIndexForRepeatTagIndex(currentRepeatGroupTagIndex) : fixMessageIndexer.getValueIndexForTag(fixTag.getTag()));
                     //-- Ensure we have a valid value
                     if (valueLength == 0) {
                         throwException(MISSING_VALUE);
@@ -98,6 +125,10 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                     parsingNextTag = true;
                     parsedValue = true;
                     fixTag.reset();
+                } else {
+                    if(inRepeatGroup && parsingRepeatingGroupCount) {
+                        parseNumber(rawFixMessage[i], noOfRepeatGroupValue);
+                    }
                 }
             }
         }
@@ -106,9 +137,33 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         }
     }
 
-    private void constructFixTag(byte msg) throws MalformedFixMessageException {
+    private void resetRepeatingGroupMembers(int tag) {
+        for (int i = 0; i < lengthOfTagMemebers; i++) {
+                tagMembersOfRepeatGroup[i][1] = -1;
+            }
+    }
+
+    private boolean alreadyCheckedRepeatGroup(int tag) {
+        for (int i = 0; i < lengthOfTagMemebers; i++) {
+            if(tagMembersOfRepeatGroup[i][0] == tag && tagMembersOfRepeatGroup[i][1] == 1){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void unsetRepeatingMembers(int tag) {
+        for (int i = 0; i < lengthOfTagMemebers; i++) {
+            if(tagMembersOfRepeatGroup[i][0] == tag){
+                tagMembersOfRepeatGroup[i][1] = 1;
+                return;
+            }
+        }
+    }
+
+    private void parseNumber(byte msg, FixTag tag) throws MalformedFixMessageException {
         //-- Convert the fixTag to integer here
-        fixTag.build(msg);
+        tag.build(msg);
         //-- Check if fixTag is valid
         validateFixTag(MALFORMED_TAG_VALUE_PAIR);
     }
@@ -150,5 +205,24 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
 
     public boolean isCharEquals(int i, char character) {
         return rawFixMessage[i] == character;
+    }
+
+    @Override
+    public byte[] getByteValueForTag(int tag, int repeatBeginTag, int instance, int instanceInMessage) {
+        if(dictionary.isTagMemberOfRepeatGroup(tag,repeatBeginTag)) {
+            int index = repeatGroupIndexer.getIndexForTag(tag,instance,instanceInMessage);
+            if (index != -1) {
+                int length = repeatGroupIndexer.getValueLengthForIndex(index);
+                byte[] value = new byte[length];
+                System.arraycopy(rawFixMessage, repeatGroupIndexer.getValueIndexForRepeatTagIndex(index), value, 0, length);
+                return value;
+           }
+        }
+        return null;
+    }
+
+    @Override
+    public String getStringValueForTag(int tag, int repeatBeginTag, int instance, int instanceInMessage) {
+        return new String(getByteValueForTag(tag,repeatBeginTag,instance,instanceInMessage));
     }
 }

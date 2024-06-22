@@ -38,8 +38,19 @@ public class DefaultFixDictionary implements FixTagLookup {
         return isRepeatingGroupBeginTag(beginTag) && contains(repeatGroupBeginTag[beginTag],tag);
     }
 
+    @Override
+    public int copyTagMembersOfRepeatGroupTo(int repeatBeginTag, int output[][]) {
+        int index = repeatGroupBeginTag[repeatBeginTag];
+        int length = repeatGroupMembers[index][0];
+        for (int i = 1; i<= length; i++){
+            output[i-1][0]= repeatGroupMembers[index][i];
+            output[i-1][1]= -1;
+        }
+        return length;
+    }
+
     private boolean contains(int index, int tag) {
-        for (int i = 1; i < repeatGroupMembers[index][0]; i++) {
+        for (int i = 1; i <= repeatGroupMembers[index][0]; i++) {
             if(tag == repeatGroupMembers[index][i]){
                 return true;
             }
