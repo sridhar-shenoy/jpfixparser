@@ -1,5 +1,6 @@
 package com.jpm.helper;
 
+import com.jpm.fixparser.HighPerformanceLowMemoryFixParser;
 import com.jpm.interfacce.Conformable;
 
 import java.util.Arrays;
@@ -82,5 +83,13 @@ public final class FixMessageIndexer {
 
     public byte getCharAt(int index) {
         return rawFixMessage[index];
+    }
+
+    public boolean isDelimiter(int i, HighPerformanceLowMemoryFixParser highPerformanceLowMemoryFixParser) {
+        return getCharAt(i) == highPerformanceLowMemoryFixParser.delimiter;
+    }
+
+    public boolean isEquals(int index) {
+        return getCharAt(index) == '=';
     }
 }

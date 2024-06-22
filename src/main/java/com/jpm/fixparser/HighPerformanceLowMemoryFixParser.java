@@ -39,7 +39,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
 
         for (int i = 0; i < indexer.getMessageLength(); i++) {
             if (parsingNextTag) {
-                if (isEquals(i)) {
+                if (indexer.isEquals(i)) {
                     //-- At this point we have FixTag constructed. Index it and update flags
                     currentTagIndex = indexTheTag(i);
                     parsingNextTag = false;
@@ -50,7 +50,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                 }
             } else {
                 //-- keep moving currentTagIndex until we reach the agreed delimiter
-                if (msg[i] == delimiter) {
+                if (indexer.isDelimiter(i, this)) {
                     //-- (i - previously recorded Starting position of the value ) is the length of the value
                     int valueLength = i - indexer.getValueIndexForTag(fixTag.getTag());
 
@@ -70,10 +70,6 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         if (!parsedValue) {
             throwException(MISSING_DELIMITER);
         }
-    }
-
-    private  boolean isEquals(int index) {
-        return indexer.getCharAt(index) == '=';
     }
 
     private void constructFixTag(byte msg) throws MalformedFixMessageException {
