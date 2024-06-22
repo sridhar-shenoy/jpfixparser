@@ -107,10 +107,4 @@ public final class FixMessageIndexer {
         return rawFixMessage[i] == character;
     }
 
-    public int linkAndGetIndex(int i, int tag) {
-        int currentTagIndex = addTagAndGetIndex(tag);
-        //-- Record the Starting position of the value of this tag
-        addValueIndex(currentTagIndex, i + 1);
-        return currentTagIndex;
-    }
 }

@@ -54,9 +54,10 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                     int tag = fixTag.getTag();
                     if (dictionary.isRepeatingGroupBeginTag(tag)) {
                         inRepeatGroup = true;
-                        repeatGroupIndexer.addBeginTagAndGetIndex(tag);
+                        currentRepeatGroupTagIndex = repeatGroupIndexer.addBeginTagAndGetIndex(tag);
                     } else {
-                        currentTagIndex = addAndGetIndex(i, tag);
+                        currentTagIndex = addAndGetIndex(tag);
+                        fixMessageIndexer.addValueIndex(currentTagIndex, i + 1);
                     }
                     parsingNextTag = false;
                     parsedValue = false;
@@ -68,12 +69,17 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
             } else {
                 //-- keep moving currentTagIndex until we reach the agreed delimiter
                 if (fixMessageIndexer.isCharEquals(i, delimiter)) {
+                    int valueLength = i - (inRepeatGroup ? repeatGroupIndexer.getValueIndexForTag(currentTagIndex) : fixMessageIndexer.getValueIndexForTag(fixTag.getTag()));
+                    //-- Ensure we have a valid value
+                    if (valueLength == 0) {
+                        throwException(MISSING_VALUE);
+                    }
 
                     if (inRepeatGroup) {
-
+                        repeatGroupIndexer.addValueLength(currentRepeatGroupTagIndex, valueLength);
                     } else {
                         //-- At this point we have a value associated with the tag. Index it for tha associated tag.
-                        linkValueLength(i, currentTagIndex);
+                        fixMessageIndexer.addValueLength(currentTagIndex, valueLength);
                     }
 
                     //-- Reset values to parse the next Tag Value Pair
@@ -88,16 +94,6 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         }
     }
 
-    private void linkValueLength(int i, int currentTagIndex) throws MalformedFixMessageException {
-        int valueLength = i - fixMessageIndexer.getValueIndexForTag(fixTag.getTag());
-
-        //-- Ensure we have a valid value
-        if (valueLength == 0) {
-            throwException(MISSING_VALUE);
-        }
-        fixMessageIndexer.addValueLength(currentTagIndex, valueLength);
-    }
-
     private void constructFixTag(byte msg) throws MalformedFixMessageException {
         //-- Convert the fixTag to integer here
         fixTag.build(msg);
@@ -105,11 +101,12 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         validateFixTag(MALFORMED_TAG_VALUE_PAIR);
     }
 
-    private int addAndGetIndex(int i, int tag) throws MalformedFixMessageException {
+    private int addAndGetIndex(int tag) throws MalformedFixMessageException {
         //-- Validate always before indexing
         validateFixTag(INCORRECT_TAG);
         //-- Link parsed fix tag to its lookup Index
-        return fixMessageIndexer.linkAndGetIndex(i, tag);
+        //-- Record the Starting position of the value of this tag
+        return fixMessageIndexer.addTagAndGetIndex(tag);
     }
 
     private void initializeInternalCache(byte[] msg) {
