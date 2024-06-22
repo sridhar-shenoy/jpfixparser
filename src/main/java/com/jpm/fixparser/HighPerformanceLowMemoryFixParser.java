@@ -39,7 +39,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
 
         for (int i = 0; i < indexer.getMessageLength(); i++) {
             if (parsingNextTag) {
-                if (msg[i] == '=') {
+                if (isEquals(i)) {
                     //-- At this point we have FixTag constructed. Index it and update flags
                     currentTagIndex = indexTheTag(i);
                     parsingNextTag = false;
@@ -70,6 +70,10 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         if (!parsedValue) {
             throwException(MISSING_DELIMITER);
         }
+    }
+
+    private  boolean isEquals(int index) {
+        return indexer.getCharAt(index) == '=';
     }
 
     private void constructFixTag(byte msg) throws MalformedFixMessageException {

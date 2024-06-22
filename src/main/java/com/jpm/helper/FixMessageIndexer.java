@@ -79,4 +79,8 @@ public final class FixMessageIndexer {
         }
         return null;
     }
+
+    public byte getCharAt(int index) {
+        return rawFixMessage[index];
+    }
 }
