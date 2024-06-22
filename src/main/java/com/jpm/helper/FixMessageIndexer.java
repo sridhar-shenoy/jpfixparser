@@ -45,9 +45,9 @@ public final class FixMessageIndexer {
     private int rawFixMessageLength;
 
     public FixMessageIndexer(Conformable policy) {
-        this.tagLookupIndices = new int[policy.getMaxFixTagSupported()];
-        this.fixTags = new int[policy.getMaxNumberOfTagValuePairPerMessage()];
-        this.valueIndexLengthMatrix = new int[policy.getMaxNumberOfTagValuePairPerMessage()][2];
+        this.tagLookupIndices = new int[policy.maxFixTagSupported()];
+        this.fixTags = new int[policy.maxNumberOfTagValuePairPerMessage()];
+        this.valueIndexLengthMatrix = new int[policy.maxNumberOfTagValuePairPerMessage()][2];
         this.rawFixMessage = new byte[policy.maxLengthOfFixMessage()];
     }
 
@@ -107,7 +107,7 @@ public final class FixMessageIndexer {
         return rawFixMessage[index];
     }
 
-    public boolean isCharInFixMessageAtEquals(int i, char fixDelimiter1) {
+    public boolean isCharEquals(int i, char fixDelimiter1) {
         return charInFixMessageAt(i) == fixDelimiter1;
     }
 }

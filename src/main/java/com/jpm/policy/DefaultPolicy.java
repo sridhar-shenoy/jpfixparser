@@ -1,6 +1,8 @@
 package com.jpm.policy;
 
+import com.jpm.dictionary.DefaultFixDictionary;
 import com.jpm.interfacce.Conformable;
+import com.jpm.interfacce.FixTagLookup;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,17 +37,17 @@ public class DefaultPolicy implements Conformable {
     }
 
      @Override
-    public int getMaxNumberOfTagValuePairPerMessage() {
+    public int maxNumberOfTagValuePairPerMessage() {
         return maxNumberOfTagValuePairPerMessage;
     }
 
     @Override
-    public int getMaxFixTagSupported() {
+    public int maxFixTagSupported() {
         return maxFixTagSupported;
     }
 
     @Override
-    public char getFixDelimiter() {
+    public char delimiter() {
         return delimiter;
     }
 
@@ -55,13 +57,13 @@ public class DefaultPolicy implements Conformable {
     }
 
     @Override
-    public boolean isRepeatingGroupBeginTag(int tag) {
-        return false;
+    public int maxNumberOfRepeatingGroupAllowed() {
+        return maxNumberOfRepeatingGroup;
     }
 
     @Override
-    public int getMaxNumberOfRepeatingGroupAllowed() {
-        return maxNumberOfRepeatingGroup;
+    public FixTagLookup dictionary() {
+        return new DefaultFixDictionary(this);
     }
 
     public static Conformable getDefaultPolicy(){

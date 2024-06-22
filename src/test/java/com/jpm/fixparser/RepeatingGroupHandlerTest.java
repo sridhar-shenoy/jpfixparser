@@ -62,46 +62,46 @@ public class RepeatingGroupHandlerTest {
         assertEquals(-1, handler.getLastOccurrenceIndexOfBeginTagWithinMessage(453));
         assertEquals(-1, handler.getOccurrenceIndexWithinRepeatingGroup(447, 0));
 
-        int occurrenceIndexOfBeginTagWithinMessage = handler.addBeginTag(453);
+        int indexOfBeginTagWithinMessage = handler.addBeginTag(453);
         handler.addGroupMemberTagForRepeatBeginTag(447, 453);
         handler.addGroupMemberTagForRepeatBeginTag(448, 453);
         handler.addGroupMemberTagForRepeatBeginTag(452, 453);
 
         assertEquals(0, handler.getLastOccurrenceIndexOfBeginTagWithinMessage(453));
-        assertEquals(0, handler.getLastOccurrenceIndexOfTagWithinGroup(447, occurrenceIndexOfBeginTagWithinMessage));
-        assertEquals(0, handler.getLastOccurrenceIndexOfTagWithinGroup(448, occurrenceIndexOfBeginTagWithinMessage));
-        assertEquals(0, handler.getLastOccurrenceIndexOfTagWithinGroup(452, occurrenceIndexOfBeginTagWithinMessage));
-
-        handler.addGroupMemberTagForRepeatBeginTag(447, 453);
-        handler.addGroupMemberTagForRepeatBeginTag(448, 453);
-        handler.addGroupMemberTagForRepeatBeginTag(452, 453);
-
-        assertEquals(0, handler.getLastOccurrenceIndexOfBeginTagWithinMessage(453));
-        assertEquals(1, handler.getLastOccurrenceIndexOfTagWithinGroup(447, occurrenceIndexOfBeginTagWithinMessage));
-        assertEquals(1, handler.getLastOccurrenceIndexOfTagWithinGroup(448, occurrenceIndexOfBeginTagWithinMessage));
-        assertEquals(1, handler.getLastOccurrenceIndexOfTagWithinGroup(452, occurrenceIndexOfBeginTagWithinMessage));
+        assertEquals(0, handler.getLastOccurrenceIndexOfTagWithinGroup(447, indexOfBeginTagWithinMessage));
+        assertEquals(0, handler.getLastOccurrenceIndexOfTagWithinGroup(448, indexOfBeginTagWithinMessage));
+        assertEquals(0, handler.getLastOccurrenceIndexOfTagWithinGroup(452, indexOfBeginTagWithinMessage));
 
         handler.addGroupMemberTagForRepeatBeginTag(447, 453);
         handler.addGroupMemberTagForRepeatBeginTag(448, 453);
         handler.addGroupMemberTagForRepeatBeginTag(452, 453);
 
         assertEquals(0, handler.getLastOccurrenceIndexOfBeginTagWithinMessage(453));
-        assertEquals(2, handler.getLastOccurrenceIndexOfTagWithinGroup(447, occurrenceIndexOfBeginTagWithinMessage));
-        assertEquals(2, handler.getLastOccurrenceIndexOfTagWithinGroup(448, occurrenceIndexOfBeginTagWithinMessage));
-        assertEquals(2, handler.getLastOccurrenceIndexOfTagWithinGroup(452, occurrenceIndexOfBeginTagWithinMessage));
+        assertEquals(1, handler.getLastOccurrenceIndexOfTagWithinGroup(447, indexOfBeginTagWithinMessage));
+        assertEquals(1, handler.getLastOccurrenceIndexOfTagWithinGroup(448, indexOfBeginTagWithinMessage));
+        assertEquals(1, handler.getLastOccurrenceIndexOfTagWithinGroup(452, indexOfBeginTagWithinMessage));
 
-        occurrenceIndexOfBeginTagWithinMessage = handler.addBeginTag(453);
+        handler.addGroupMemberTagForRepeatBeginTag(447, 453);
+        handler.addGroupMemberTagForRepeatBeginTag(448, 453);
+        handler.addGroupMemberTagForRepeatBeginTag(452, 453);
+
+        assertEquals(0, handler.getLastOccurrenceIndexOfBeginTagWithinMessage(453));
+        assertEquals(2, handler.getLastOccurrenceIndexOfTagWithinGroup(447, indexOfBeginTagWithinMessage));
+        assertEquals(2, handler.getLastOccurrenceIndexOfTagWithinGroup(448, indexOfBeginTagWithinMessage));
+        assertEquals(2, handler.getLastOccurrenceIndexOfTagWithinGroup(452, indexOfBeginTagWithinMessage));
+
+        indexOfBeginTagWithinMessage = handler.addBeginTag(453);
         handler.addGroupMemberTagForRepeatBeginTag(447, 453);
         handler.addGroupMemberTagForRepeatBeginTag(448, 453);
         handler.addGroupMemberTagForRepeatBeginTag(452, 453);
 
         assertEquals(1, handler.getLastOccurrenceIndexOfBeginTagWithinMessage(453));
-        assertEquals(0, handler.getLastOccurrenceIndexOfTagWithinGroup(447, occurrenceIndexOfBeginTagWithinMessage));
-        assertEquals(0, handler.getLastOccurrenceIndexOfTagWithinGroup(448, occurrenceIndexOfBeginTagWithinMessage));
-        assertEquals(0, handler.getLastOccurrenceIndexOfTagWithinGroup(452, occurrenceIndexOfBeginTagWithinMessage));
+        assertEquals(0, handler.getLastOccurrenceIndexOfTagWithinGroup(447, indexOfBeginTagWithinMessage));
+        assertEquals(0, handler.getLastOccurrenceIndexOfTagWithinGroup(448, indexOfBeginTagWithinMessage));
+        assertEquals(0, handler.getLastOccurrenceIndexOfTagWithinGroup(452, indexOfBeginTagWithinMessage));
 
 
-        occurrenceIndexOfBeginTagWithinMessage = handler.addBeginTag(453);
+        indexOfBeginTagWithinMessage = handler.addBeginTag(453);
         handler.addGroupMemberTagForRepeatBeginTag(447, 453);
         handler.addGroupMemberTagForRepeatBeginTag(448, 453);
         handler.addGroupMemberTagForRepeatBeginTag(452, 453);
@@ -111,9 +111,9 @@ public class RepeatingGroupHandlerTest {
         handler.addGroupMemberTagForRepeatBeginTag(452, 453);
 
         assertEquals(2, handler.getLastOccurrenceIndexOfBeginTagWithinMessage(453));
-        assertEquals(1, handler.getLastOccurrenceIndexOfTagWithinGroup(447, occurrenceIndexOfBeginTagWithinMessage));
-        assertEquals(1, handler.getLastOccurrenceIndexOfTagWithinGroup(448, occurrenceIndexOfBeginTagWithinMessage));
-        assertEquals(1, handler.getLastOccurrenceIndexOfTagWithinGroup(452, occurrenceIndexOfBeginTagWithinMessage));
+        assertEquals(1, handler.getLastOccurrenceIndexOfTagWithinGroup(447, indexOfBeginTagWithinMessage));
+        assertEquals(1, handler.getLastOccurrenceIndexOfTagWithinGroup(448, indexOfBeginTagWithinMessage));
+        assertEquals(1, handler.getLastOccurrenceIndexOfTagWithinGroup(452, indexOfBeginTagWithinMessage));
 
         //-- Retrieve Last occurrence from First Repeat group
         assertEquals(2, handler.getLastOccurrenceIndexOfTagWithinGroup(447, 0));

@@ -9,7 +9,7 @@ public class RepeatingGroupHandler {
 
     public RepeatingGroupHandler(Conformable policy) {
         this.policy = policy;
-        repeatingGroupOccurrenceIndex = new int[policy.getMaxNumberOfRepeatingGroupAllowed()][3];
+        repeatingGroupOccurrenceIndex = new int[policy.maxNumberOfRepeatingGroupAllowed()][3];
     }
 
     public int getOccurrenceIndexWithinRepeatingGroup(int tag, int occurrenceIndexInMessage) {

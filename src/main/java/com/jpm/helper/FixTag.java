@@ -1,11 +1,13 @@
 package com.jpm.helper;
 
+import com.jpm.interfacce.Conformable;
+
 public final class FixTag {
     public static final int BASE = 10;
     private final int maxTagSupported;
 
-    public FixTag(int maxTagSupported) {
-        this.maxTagSupported = maxTagSupported;
+    public FixTag(Conformable policy) {
+        this.maxTagSupported = policy.maxFixTagSupported();
     }
 
     private int tag = 0;

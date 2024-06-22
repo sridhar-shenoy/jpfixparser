@@ -1,10 +1,10 @@
 package com.jpm.interfacce;
 
 public interface Conformable {
-    int getMaxNumberOfTagValuePairPerMessage();
-    int getMaxFixTagSupported();
-    char getFixDelimiter();
+    int maxNumberOfTagValuePairPerMessage();
+    int maxFixTagSupported();
+    char delimiter();
     int maxLengthOfFixMessage();
-    boolean isRepeatingGroupBeginTag(int tag);
-    int getMaxNumberOfRepeatingGroupAllowed();
+    int maxNumberOfRepeatingGroupAllowed();
+    FixTagLookup dictionary();
 }

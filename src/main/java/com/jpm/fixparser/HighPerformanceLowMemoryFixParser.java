@@ -4,27 +4,33 @@ package com.jpm.fixparser;
 import com.jpm.exception.MalformedFixMessageException;
 import com.jpm.helper.FixMessageIndexer;
 import com.jpm.helper.FixTag;
+import com.jpm.helper.RepeatingGroupHandler;
 import com.jpm.interfacce.Conformable;
 import com.jpm.interfacce.FixMessageParser;
 import com.jpm.interfacce.FixTagAccessor;
+import com.jpm.interfacce.FixTagLookup;
 
 import static com.jpm.exception.ErrorMessages.*;
 
 public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, FixMessageParser {
 
-    public static final char EQUALS_CHAR = '=';
+    public static final char EQUALS_DELIMITER = '=';
     private final char delimiter;
 
-    private final FixMessageIndexer indexer;
+    private final FixMessageIndexer fixMessageIndexer;
+    private final RepeatingGroupHandler repeatGroupIndexer;
     private final FixTag fixTag;
+    private final FixTagLookup dictionary;
 
     /**
      * @param policy
      */
     public HighPerformanceLowMemoryFixParser(Conformable policy) {
-        this.delimiter = policy.getFixDelimiter();
-        indexer = new FixMessageIndexer(policy);
-        fixTag = new FixTag(policy.getMaxFixTagSupported());
+        delimiter = policy.delimiter();
+        fixTag = new FixTag(policy);
+        fixMessageIndexer = new FixMessageIndexer(policy);
+        repeatGroupIndexer = new RepeatingGroupHandler(policy);
+        dictionary = policy.dictionary();
     }
 
     @Override
@@ -38,11 +44,13 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         boolean parsingNextTag = true;
         boolean parsedValue = false;
 
-        for (int i = 0; i < indexer.getMessageLength(); i++) {
+        for (int i = 0; i < fixMessageIndexer.getMessageLength(); i++) {
             if (parsingNextTag) {
-                if (indexer.isCharInFixMessageAtEquals(i, EQUALS_CHAR)) {
+                if (fixMessageIndexer.isCharEquals(i, EQUALS_DELIMITER)) {
                     //-- At this point we have FixTag constructed. Index it and update flags
-                    currentTagIndex = indexTheTag(i);
+
+                    int tag = fixTag.getTag();
+                    currentTagIndex = indexTheTag(i, tag);
                     parsingNextTag = false;
                     parsedValue = false;
                 } else {
@@ -51,7 +59,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                 }
             } else {
                 //-- keep moving currentTagIndex until we reach the agreed delimiter
-                if (indexer.isCharInFixMessageAtEquals(i, delimiter)) {
+                if (fixMessageIndexer.isCharEquals(i, delimiter)) {
 
                     //-- At this point we have a value associated with the tag. Index it for tha associated tag.
                     linkValueLength(i, currentTagIndex);
@@ -69,13 +77,13 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
     }
 
     private void linkValueLength(int i, int currentTagIndex) throws MalformedFixMessageException {
-        int valueLength = i - indexer.getValueIndexForTag(fixTag.getTag());
+        int valueLength = i - fixMessageIndexer.getValueIndexForTag(fixTag.getTag());
 
         //-- Ensure we have a valid value
         if (valueLength == 0) {
             throwException(MISSING_VALUE);
         }
-        indexer.addValueLength(currentTagIndex, valueLength);
+        fixMessageIndexer.addValueLength(currentTagIndex, valueLength);
     }
 
     private void constructFixTag(byte msg) throws MalformedFixMessageException {
@@ -85,19 +93,19 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         validateFixTag(MALFORMED_TAG_VALUE_PAIR);
     }
 
-    private int indexTheTag(int i) throws MalformedFixMessageException {
+    private int indexTheTag(int i, int tag) throws MalformedFixMessageException {
         //-- Validate always before indexing
         validateFixTag(INCORRECT_TAG);
         //-- Link parsed fix tag to its lookup Index
-        int currentTagIndex = indexer.addTag(fixTag.getTag());
+        int currentTagIndex = fixMessageIndexer.addTag(tag);
         //-- Record the Starting position of the value of this tag
-        indexer.addValueIndex(currentTagIndex, i + 1);
+        fixMessageIndexer.addValueIndex(currentTagIndex, i + 1);
         return currentTagIndex;
     }
 
     private void initializeInternalCache(byte[] msg) {
         fixTag.reset();
-        indexer.copyToLocalCache(msg);
+        fixMessageIndexer.copyToLocalCache(msg);
     }
 
     private void validateFixTag(String errorTest) throws MalformedFixMessageException {
@@ -119,6 +127,6 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
      * @return
      */
     public byte[] getByteValueForTag(int tag) {
-        return indexer.getByteValueForTag(tag);
+        return fixMessageIndexer.getByteValueForTag(tag);
     }
 }
