@@ -12,6 +12,7 @@ import static com.jpm.exception.ErrorMessages.*;
 
 public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, FixMessageParser {
 
+    public static final char EQUALS_CHAR = '=';
     private final char delimiter;
 
     private final FixMessageIndexer indexer;
@@ -39,7 +40,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
 
         for (int i = 0; i < indexer.getMessageLength(); i++) {
             if (parsingNextTag) {
-                if (indexer.isCharAtIndexEquals(i, '=')) {
+                if (indexer.isCharInFixMessageAtEquals(i, EQUALS_CHAR)) {
                     //-- At this point we have FixTag constructed. Index it and update flags
                     currentTagIndex = indexTheTag(i);
                     parsingNextTag = false;
@@ -50,8 +51,11 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                 }
             } else {
                 //-- keep moving currentTagIndex until we reach the agreed delimiter
-                if (indexer.isCharAtIndexEquals(i, delimiter)) {
+                if (indexer.isCharInFixMessageAtEquals(i, delimiter)) {
+
+                    //-- At this point we have a value associated with the tag. Index it for tha associated tag.
                     linkValueLength(i, currentTagIndex);
+
                     //-- Reset values to parse the next Tag Value Pair
                     parsingNextTag = true;
                     parsedValue = true;
@@ -117,5 +121,4 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
     public byte[] getByteValueForTag(int tag) {
         return indexer.getByteValueForTag(tag);
     }
-
 }

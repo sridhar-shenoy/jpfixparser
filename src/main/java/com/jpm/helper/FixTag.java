@@ -1,6 +1,7 @@
 package com.jpm.helper;
 
-public class FixTag {
+public final class FixTag {
+    public static final int BASE = 10;
     private final int maxTagSupported;
 
     public FixTag(int maxTagSupported) {
@@ -10,7 +11,7 @@ public class FixTag {
     private int tag = 0;
 
     public void build(byte b){
-        tag = (tag * 10) + (b - '0');
+        tag = (tag * BASE) + (b - '0');
     }
 
     public boolean isInvalid(){

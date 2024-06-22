@@ -5,20 +5,43 @@ import com.jpm.interfacce.Conformable;
 import java.util.Arrays;
 
 public final class FixMessageIndexer {
+
+    /**
+     *  This array links the fix tag to its index in the fixTag array
+     *  for. e.g
+     *  Given fix message 35=D|34=100
+     *  tagLookupIndices[34] = 2
+     *  tagLookupIndices[35] = 1
+     */
     private final int[] tagLookupIndices;
 
-    /*
-    Colum 0 = fix tag number
+    /**
+     * This array holds the link to its actual position within incoming rawFixMessage
      */
     private final int[] fixTags;
 
-    /*
-    Colum 0 = tagIndex from fixTags[],
-    Colum 1 = length of the tag Value
+    /**
+     * This matrix holds the link to value start position and its length
+     *
+     * Colum 0 = index of first value character in rawFixMessage
+     * Colum 1 = length of the tag Value
      */
     private final int[][] valueIndexLengthMatrix;
+
+    /**
+     * This counter is incremented every time a tag value pair is parsed
+     */
     private int currentTagIndex = 0;
+
+    /**
+     *  incoming fix message must be copied to a local byte array
+     *  length of this byte array is decided by the policy class
+     */
     private byte[] rawFixMessage;
+
+    /**
+     * This variable is set to length if the fixmessage currently being parsed
+     */
     private int rawFixMessageLength;
 
     public FixMessageIndexer(Conformable policy) {
@@ -80,11 +103,11 @@ public final class FixMessageIndexer {
         return null;
     }
 
-    public byte getCharAt(int index) {
+    public byte charInFixMessageAt(int index) {
         return rawFixMessage[index];
     }
 
-    public boolean isCharAtIndexEquals(int i, char fixDelimiter1) {
-        return getCharAt(i) == fixDelimiter1;
+    public boolean isCharInFixMessageAtEquals(int i, char fixDelimiter1) {
+        return charInFixMessageAt(i) == fixDelimiter1;
     }
 }
