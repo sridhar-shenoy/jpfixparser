@@ -2,9 +2,9 @@ package com.jpm.fixparser;
 
 
 import com.jpm.exception.MalformedFixMessageException;
+import com.jpm.interfacce.Conformable;
 import com.jpm.interfacce.FixMessageParser;
 import com.jpm.interfacce.FixTagAccessor;
-import com.jpm.policy.DefaultPolicy;
 
 import java.util.Arrays;
 
@@ -12,26 +12,44 @@ import static com.jpm.exception.ErrorMessages.*;
 
 public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, FixMessageParser {
 
+    private final Conformable policy;
     private final char delimiter;
     private byte[] rawFixMessage;
-    private final int[] fixTags;
+
     private final int[] tagLookupIndices;
-    private final DefaultPolicy defaultPolicy;
-    private final int[] repeatingGroupLookupIndices;
+
+    /*
+    Colum 0 = fix tag number
+     */
+    private final int[] fixTags;
+
+    /*
+    Colum 0 = tagIndex from fixTags[],
+    Colum 1 = length of the tag Value
+     */
     private final int[][] valueIndexLengthMatrix;
+
+    /*
+    Colum 0 = repeatingGroup fix tag number ,
+    Colum 1 = repeatingGroup fix tag number's occurrence index  within the repeat group
+    Colum 2 = repeatingGroup fix tag number's occurrence index  within fix message
+     */
+
     private int currentTagIndex;
 
     /**
      * @param policy
      */
-    public HighPerformanceLowMemoryFixParser(DefaultPolicy policy) {
-        this.fixTags = new int[policy.getMaxNumberOfTagValuePairPerMessage()];
-        this.tagLookupIndices = new int[policy.getMaxFixTagSupported()];
-        this.defaultPolicy = policy;
-        this.repeatingGroupLookupIndices = new int[100];
-        this.valueIndexLengthMatrix = new int[policy.getMaxNumberOfTagValuePairPerMessage()][2];
+    public HighPerformanceLowMemoryFixParser(Conformable policy) {
+        this.policy = policy;
         this.delimiter = policy.getFixDelimiter();
         this.rawFixMessage = new byte[policy.maxLengthOfFixMessage()];
+
+
+        this.tagLookupIndices = new int[policy.getMaxFixTagSupported()];
+
+        this.fixTags = new int[policy.getMaxNumberOfTagValuePairPerMessage()];
+        this.valueIndexLengthMatrix = new int[policy.getMaxNumberOfTagValuePairPerMessage()][2];
     }
 
     @Override
@@ -51,8 +69,8 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                 if (msg[i] == '=') {
 
                     //-- Ensure we have a valid Fix Tag
-                    if (fixTag <= 0 || fixTag > defaultPolicy.getMaxFixTagSupported()) {
-                        throwException(MALFORMED_TAG_VALUE_PAIR);
+                    if (fixTag <= 0 || fixTag > policy.getMaxFixTagSupported()) {
+                        throwException(INCORRECT_TAG);
                     }
 
                     //-- Link parsed fix tag to its lookup Index
@@ -70,7 +88,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                     fixTag = (fixTag * 10) + (msg[i] - '0');
 
                     //-- Check if fixTag is valid
-                    if (fixTag <= 0 || fixTag > defaultPolicy.getMaxFixTagSupported()) {
+                    if (fixTag <= 0 || fixTag > policy.getMaxFixTagSupported()) {
                         throwException(MALFORMED_TAG_VALUE_PAIR);
                     }
                 }

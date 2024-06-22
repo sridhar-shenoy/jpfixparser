@@ -14,7 +14,7 @@ public class MalformedFixMessageTest extends FixMessageTestBase {
         try {
             parser.parse(getBytes("=FIX.4.4\u000110=092\u0001"));
         } catch (MalformedFixMessageException e) {
-            assertEquals("Unable to parse fix message due to malformed tag value pair", e.getMessage());
+            assertEquals("Value of Tag is Incorrect", e.getMessage());
             return;
         }
         fail("Should have thrown an exception");
@@ -25,7 +25,7 @@ public class MalformedFixMessageTest extends FixMessageTestBase {
         try {
             parser.parse(getBytes("8=FIX.4.4\u0001=092\u0001"));
         } catch (MalformedFixMessageException e) {
-            assertEquals("Unable to parse fix message due to malformed tag value pair", e.getMessage());
+            assertEquals("Value of Tag is Incorrect", e.getMessage());
             return;
         }
         fail("Should have thrown an exception");
@@ -36,7 +36,7 @@ public class MalformedFixMessageTest extends FixMessageTestBase {
         try {
             parser.parse(getBytes("8=FIX.4.4\u0001=D\u000110=092\u0001"));
         } catch (MalformedFixMessageException e) {
-            assertEquals("Unable to parse fix message due to malformed tag value pair", e.getMessage());
+            assertEquals("Value of Tag is Incorrect", e.getMessage());
             return;
         }
         fail("Should have thrown an exception");

@@ -14,7 +14,7 @@ public class FixMessageTestBase {
 
     @BeforeClass
     public static void setUp() {
-        parser = new HighPerformanceLowMemoryFixParser(new DefaultPolicy(100,1000, 10000, '\u0001'));
+        parser = new HighPerformanceLowMemoryFixParser(DefaultPolicy.getDefaultPolicy());
     }
 
     protected String toString(byte[] byteValueForTag) {

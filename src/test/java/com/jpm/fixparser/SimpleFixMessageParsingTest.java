@@ -31,7 +31,7 @@ public class SimpleFixMessageParsingTest extends FixMessageTestBase {
 
     @Test
     public void parseSimpleFixMessageWithDifferentDelimiterForByteValues() throws MalformedFixMessageException {
-        HighPerformanceLowMemoryFixParser pipeDelimitedParser = new HighPerformanceLowMemoryFixParser(new DefaultPolicy(100, 1000, 1000, '|'));
+        HighPerformanceLowMemoryFixParser pipeDelimitedParser = new HighPerformanceLowMemoryFixParser(DefaultPolicy.getCustomPolicy(1000,1000,1000,'|',100));
         pipeDelimitedParser.parse(getBytes("8=FIX.4.4|9=148|35=D|34=1080|10=092|"));
 
         assertEquals("FIX.4.4", toString(pipeDelimitedParser.getByteValueForTag(8)));
@@ -42,7 +42,7 @@ public class SimpleFixMessageParsingTest extends FixMessageTestBase {
 
     @Test
     public void parseSimpleFixMessageWithDifferentDelimiterForStringValues() throws MalformedFixMessageException {
-        HighPerformanceLowMemoryFixParser pipeDelimitedParser = new HighPerformanceLowMemoryFixParser(new DefaultPolicy(100, 1000, 1000, '|'));
+        HighPerformanceLowMemoryFixParser pipeDelimitedParser = new HighPerformanceLowMemoryFixParser(DefaultPolicy.getCustomPolicy(1000,1000,1000,'|',100));
         pipeDelimitedParser.parse(getBytes("8=FIX.4.4|9=148|35=D|34=1080|10=092|"));
 
         assertEquals("FIX.4.4", pipeDelimitedParser.getStringValueForTag(8));

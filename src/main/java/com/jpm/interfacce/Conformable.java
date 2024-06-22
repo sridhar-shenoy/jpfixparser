@@ -6,4 +6,5 @@ public interface Conformable {
     char getFixDelimiter();
     int maxLengthOfFixMessage();
     boolean isRepeatingGroupBeginTag(int tag);
+    int getMaxNumberOfRepeatingGroupAllowed();
 }
