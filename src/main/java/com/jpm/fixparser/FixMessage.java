@@ -6,7 +6,7 @@ import com.jpm.api.FixTagLookup;
 import com.jpm.helper.FixMessageIndexer;
 import com.jpm.helper.RepeatingGroupIndexer;
 
-class FixMessage implements FixTagAccessor {
+final class FixMessage implements FixTagAccessor {
 
     public static final char EQUALS_SIGN = '=';
     private final FixMessageIndexer fixMessageIndexer;
@@ -76,7 +76,6 @@ class FixMessage implements FixTagAccessor {
 
     public void reset() {
         fixMessageIndexer.reset();
-        repeatGroupIndexer.reset();
     }
 
     public boolean hasCompletedParsingTag(int index) {

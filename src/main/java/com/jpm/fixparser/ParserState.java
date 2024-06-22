@@ -1,6 +1,6 @@
 package com.jpm.fixparser;
 
-class ParserState {
+final class ParserState {
     int currentTagIndex = 0;
     int currentRepeatGroupTagIndex = 0;
     boolean inRepeatGroup = false;

@@ -4,10 +4,11 @@ package com.jpm.fixparser;
 import com.jpm.api.*;
 import com.jpm.exception.MalformedFixMessageException;
 import com.jpm.helper.NumericValue;
+import com.jpm.policy.DefaultPolicy;
 
 import static com.jpm.exception.ErrorMessages.*;
 
-public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, Parsable {
+final class HighPerformanceLowMemoryFixParser implements FixMessageParser, FixTagAccessor {
 
     private final NumericValue numericValue;
     private final NumericValue noOfRepeatGroupValue;
@@ -42,6 +43,22 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         if (!state.parsedValue) {
             throwException(MISSING_DELIMITER);
         }
+    }
+
+    @Override
+    public FixTagAccessor getReadOnlyClone() throws MalformedFixMessageException {
+        int messageLength = fixMessage.getMessageLength();
+        if (messageLength == 0) {
+            throwException("Un-initialized object cannot be cloned");
+        }
+        /*
+            The policy can be customised to ensure clone has minimal memory footprint.
+         */
+        HighPerformanceLowMemoryFixParser highPerformanceLowMemoryFixParser = new HighPerformanceLowMemoryFixParser(DefaultPolicy.getDefaultPolicy());
+        byte[] newArray = new byte[messageLength];
+        System.arraycopy(fixMessage.getRawFixMessage(),0,newArray,0,messageLength);
+        highPerformanceLowMemoryFixParser.parse(newArray);
+        return highPerformanceLowMemoryFixParser;
     }
 
     private void parseBytesAt(int index) throws MalformedFixMessageException {
@@ -104,12 +121,6 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
 
 
     private void handleRepeatGroupTag(int tag, int index) {
-        int noOfRepeatGroupValueInt = noOfRepeatGroupValue.getInt();
-        if (state.countOfRepeatGroupParsed == noOfRepeatGroupValueInt && noOfRepeatGroupValueInt != 0) {
-            state.inRepeatGroup = false;
-            state.countOfRepeatGroupParsed = 0;
-            noOfRepeatGroupValue.reset();
-        }
         if (alreadyCheckedRepeatGroup(tag)) {
             state.countOfRepeatGroupParsed++;
             resetRepeatingGroupMembers(tag);

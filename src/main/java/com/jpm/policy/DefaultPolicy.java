@@ -18,7 +18,7 @@ public class DefaultPolicy implements Conformable {
     private final int maxLengthOfFixMessage;
     private final int maxNumberOfRepeatingGroup;
 
-    private DefaultPolicy(int maxNumberOfTagValuePair, int maxFixTags, int maxLengthOfFixMsg, char fixDelimiter, int maxRepeatingGroup) {
+    public DefaultPolicy(int maxNumberOfTagValuePair, int maxFixTags, int maxLengthOfFixMsg, char fixDelimiter, int maxRepeatingGroup) {
         this.fixRepeatingGroupLookupMap = new HashMap<>();
         maxNumberOfTagValuePairPerMessage = maxNumberOfTagValuePair;
         maxFixTagSupported = maxFixTags;
