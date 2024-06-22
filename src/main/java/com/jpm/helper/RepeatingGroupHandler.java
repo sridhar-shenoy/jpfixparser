@@ -4,11 +4,9 @@ import com.jpm.interfacce.Conformable;
 
 public class RepeatingGroupHandler {
     private final int[][] repeatingGroupOccurrenceIndex;
-    private final Conformable policy;
     private int currentArrayIndex = 0;
 
     public RepeatingGroupHandler(Conformable policy) {
-        this.policy = policy;
         repeatingGroupOccurrenceIndex = new int[policy.maxNumberOfRepeatingGroupAllowed()][3];
     }
 
@@ -16,38 +14,38 @@ public class RepeatingGroupHandler {
         return -1;
     }
 
-    public int addBeginTag(int repeatGroupBeginTag) {
-        int occurrenceIndexOfBeginTagWithinMessage = getLastOccurrenceIndexOfBeginTagWithinMessage(repeatGroupBeginTag);
+    public int addBeginTagAndGetIndex(int repeatGroupBeginTag) {
+        int indexOfBeginTagWithinMessage = getLastOccurrenceIndexOfBeginTagWithinMessage(repeatGroupBeginTag);
         repeatingGroupOccurrenceIndex[currentArrayIndex][0] = repeatGroupBeginTag;
         repeatingGroupOccurrenceIndex[currentArrayIndex][1] = 0; // Begin tags will always have one occurrence within a group
-        repeatingGroupOccurrenceIndex[currentArrayIndex][2] = ++occurrenceIndexOfBeginTagWithinMessage;
-        currentArrayIndex++;
-        return occurrenceIndexOfBeginTagWithinMessage;
+        repeatingGroupOccurrenceIndex[currentArrayIndex][2] = ++indexOfBeginTagWithinMessage;
+        return currentArrayIndex++;
     }
 
-    public void addGroupMemberTagForRepeatBeginTag(int repeatGroupMemberTag,int repeatGroupBeginTag) {
-        int occurrenceIndexOfBeginTagWithinMessage = getLastOccurrenceIndexOfBeginTagWithinMessage(repeatGroupBeginTag);
-        int occurrenceIndexOfTagWithinGroup = getLastOccurrenceIndexOfTagWithinGroup(repeatGroupMemberTag, occurrenceIndexOfBeginTagWithinMessage);
+    public int addGroupMemberTagForRepeatBeginTag(int repeatGroupMemberTag, int repeatGroupBeginTag) {
+        int occurrenceIndexOfBeginTagWithinMessage = getLastOccurrenceIndexOfBeginTagWithinMessage(repeatingGroupOccurrenceIndex[repeatGroupBeginTag][0]);
+        int occurrenceIndexOfTagWithinGroup = getLastOccurrenceIndexOfTagWithinGroup(repeatGroupMemberTag, repeatGroupBeginTag);
         repeatingGroupOccurrenceIndex[currentArrayIndex][0] = repeatGroupMemberTag;
         repeatingGroupOccurrenceIndex[currentArrayIndex][1] = ++occurrenceIndexOfTagWithinGroup;
         repeatingGroupOccurrenceIndex[currentArrayIndex][2] = occurrenceIndexOfBeginTagWithinMessage;
-        currentArrayIndex++;
+        return currentArrayIndex++;
     }
 
     public int getLastOccurrenceIndexOfBeginTagWithinMessage(int repeatingGroupBeginTag) {
         int currentIndex = -1;
         for (int i = 0; i < currentArrayIndex; i++) {
-            if(repeatingGroupOccurrenceIndex[i][0] == repeatingGroupBeginTag){
+            if (repeatingGroupOccurrenceIndex[i][0] == repeatingGroupBeginTag) {
                 currentIndex = repeatingGroupOccurrenceIndex[i][2];
             }
         }
         return currentIndex;
     }
 
-    public int getLastOccurrenceIndexOfTagWithinGroup(int repeatGroupMemberTag, int occurrenceIndexOfBeginTagWithinMessage) {
+    public int getLastOccurrenceIndexOfTagWithinGroup(int repeatGroupMemberTag, int beginTagIndex) {
         int currentGroupOccurrenceIndex = -1;
         for (int i = 0; i < currentArrayIndex; i++) {
-            if(repeatingGroupOccurrenceIndex[i][0] == repeatGroupMemberTag && repeatingGroupOccurrenceIndex[i][2] == occurrenceIndexOfBeginTagWithinMessage ){
+            if (repeatingGroupOccurrenceIndex[i][0] == repeatGroupMemberTag
+                    && repeatingGroupOccurrenceIndex[i][2] == repeatingGroupOccurrenceIndex[beginTagIndex][2]) {
                 currentGroupOccurrenceIndex = repeatingGroupOccurrenceIndex[i][1];
             }
         }

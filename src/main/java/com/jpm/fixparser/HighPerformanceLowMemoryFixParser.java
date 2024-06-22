@@ -41,6 +41,8 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         initializeInternalCache(msg);
 
         int currentTagIndex = 0;
+        int currentRepeatGroupTagIndex = 0;
+        boolean inRepeatGroup = false;
         boolean parsingNextTag = true;
         boolean parsedValue = false;
 
@@ -50,9 +52,15 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                     //-- At this point we have FixTag constructed. Index it and update flags
 
                     int tag = fixTag.getTag();
-                    currentTagIndex = indexTheTag(i, tag);
+                    if (dictionary.isRepeatingGroupBeginTag(tag)) {
+                        inRepeatGroup = true;
+                        repeatGroupIndexer.addBeginTagAndGetIndex(tag);
+                    } else {
+                        currentTagIndex = addAndGetIndex(i, tag);
+                    }
                     parsingNextTag = false;
                     parsedValue = false;
+
                 } else {
                     //-- At this point we are still constructing fixTag. Validate and continue parsing
                     constructFixTag(msg[i]);
@@ -61,8 +69,12 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                 //-- keep moving currentTagIndex until we reach the agreed delimiter
                 if (fixMessageIndexer.isCharEquals(i, delimiter)) {
 
-                    //-- At this point we have a value associated with the tag. Index it for tha associated tag.
-                    linkValueLength(i, currentTagIndex);
+                    if (inRepeatGroup) {
+
+                    } else {
+                        //-- At this point we have a value associated with the tag. Index it for tha associated tag.
+                        linkValueLength(i, currentTagIndex);
+                    }
 
                     //-- Reset values to parse the next Tag Value Pair
                     parsingNextTag = true;
@@ -93,14 +105,11 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         validateFixTag(MALFORMED_TAG_VALUE_PAIR);
     }
 
-    private int indexTheTag(int i, int tag) throws MalformedFixMessageException {
+    private int addAndGetIndex(int i, int tag) throws MalformedFixMessageException {
         //-- Validate always before indexing
         validateFixTag(INCORRECT_TAG);
         //-- Link parsed fix tag to its lookup Index
-        int currentTagIndex = fixMessageIndexer.addTag(tag);
-        //-- Record the Starting position of the value of this tag
-        fixMessageIndexer.addValueIndex(currentTagIndex, i + 1);
-        return currentTagIndex;
+        return fixMessageIndexer.linkAndGetIndex(i, tag);
     }
 
     private void initializeInternalCache(byte[] msg) {

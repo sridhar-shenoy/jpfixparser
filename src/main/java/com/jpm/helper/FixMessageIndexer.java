@@ -51,7 +51,7 @@ public final class FixMessageIndexer {
         this.rawFixMessage = new byte[policy.maxLengthOfFixMessage()];
     }
 
-    public int addTag(int tag) {
+    public int addTagAndGetIndex(int tag) {
         fixTags[currentTagIndex] = tag;
         tagLookupIndices[tag] = currentTagIndex;
         return currentTagIndex++;
@@ -103,11 +103,14 @@ public final class FixMessageIndexer {
         return null;
     }
 
-    public byte charInFixMessageAt(int index) {
-        return rawFixMessage[index];
+    public boolean isCharEquals(int i, char character) {
+        return rawFixMessage[i] == character;
     }
 
-    public boolean isCharEquals(int i, char fixDelimiter1) {
-        return charInFixMessageAt(i) == fixDelimiter1;
+    public int linkAndGetIndex(int i, int tag) {
+        int currentTagIndex = addTagAndGetIndex(tag);
+        //-- Record the Starting position of the value of this tag
+        addValueIndex(currentTagIndex, i + 1);
+        return currentTagIndex;
     }
 }

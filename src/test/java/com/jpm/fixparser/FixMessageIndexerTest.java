@@ -21,17 +21,17 @@ public class FixMessageIndexerTest {
         //8=FIX.4.4\u00019=148\u000135=D\u000134=1080\u000110=092\u0001
 
         //-- Add tag 8 at 0, Value starts at index 2 with length 7
-        int index = fixMessageIndexer.addTag(8);
+        int index = fixMessageIndexer.addTagAndGetIndex(8);
         fixMessageIndexer.addValueIndex(index,2 );
         fixMessageIndexer.addValueLength(index, 7);
 
         //-- Add tag 9 at 10, Value starts at index 12 with length 3
-        index = fixMessageIndexer.addTag(9);
+        index = fixMessageIndexer.addTagAndGetIndex(9);
         fixMessageIndexer.addValueIndex(index,12 );
         fixMessageIndexer.addValueLength(index, 3);
 
         //-- Add tag 35 at 18, Value starts at index 21 with length 4
-        index = fixMessageIndexer.addTag(35);
+        index = fixMessageIndexer.addTagAndGetIndex(35);
         fixMessageIndexer.addValueIndex(index,21 );
         fixMessageIndexer.addValueLength(index, 4);
 
