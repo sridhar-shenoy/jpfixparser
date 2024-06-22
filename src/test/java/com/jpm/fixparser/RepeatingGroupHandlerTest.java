@@ -1,5 +1,6 @@
 package com.jpm.fixparser;
 
+import com.jpm.helper.RepeatingGroupHandler;
 import com.jpm.policy.DefaultPolicy;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,7 +1,7 @@
 package com.jpm.fixparser;
 
+import com.jpm.helper.FixMessageIndexer;
 import com.jpm.policy.DefaultPolicy;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

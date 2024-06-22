@@ -1,4 +1,4 @@
-package com.jpm.fixparser;
+package com.jpm.helper;
 
 import com.jpm.interfacce.Conformable;
 
