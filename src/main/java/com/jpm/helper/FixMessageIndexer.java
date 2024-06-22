@@ -17,7 +17,6 @@ public final class FixMessageIndexer {
     Colum 1 = length of the tag Value
      */
     private final int[][] valueIndexLengthMatrix;
-    private final char fixDelimiter;
     private int currentTagIndex = 0;
     private byte[] rawFixMessage;
     private int rawFixMessageLength;
@@ -27,7 +26,6 @@ public final class FixMessageIndexer {
         this.fixTags = new int[policy.getMaxNumberOfTagValuePairPerMessage()];
         this.valueIndexLengthMatrix = new int[policy.getMaxNumberOfTagValuePairPerMessage()][2];
         this.rawFixMessage = new byte[policy.maxLengthOfFixMessage()];
-        this.fixDelimiter = policy.getFixDelimiter();
     }
 
     public int addTag(int tag) {
@@ -86,11 +84,7 @@ public final class FixMessageIndexer {
         return rawFixMessage[index];
     }
 
-    public boolean isDelimiter(int i) {
-        return getCharAt(i) == this.fixDelimiter;
-    }
-
-    public boolean isEquals(int index) {
-        return getCharAt(index) == '=';
+    public boolean isCharAtIndexEquals(int i, char fixDelimiter1) {
+        return getCharAt(i) == fixDelimiter1;
     }
 }
