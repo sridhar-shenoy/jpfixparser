@@ -1,7 +1,7 @@
 package com.jpm.dictionary;
 
-import com.jpm.interfacce.Conformable;
-import com.jpm.interfacce.FixTagLookup;
+import com.jpm.api.Conformable;
+import com.jpm.api.FixTagLookup;
 
 import java.util.Arrays;
 

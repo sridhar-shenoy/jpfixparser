@@ -1,6 +1,6 @@
 package com.jpm.helper;
 
-import com.jpm.interfacce.Conformable;
+import com.jpm.api.Conformable;
 
 public class RepeatingGroupHandler {
     public static final int TAG_NUMBER = 0;

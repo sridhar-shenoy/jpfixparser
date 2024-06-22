@@ -1,8 +1,8 @@
 package com.jpm.policy;
 
+import com.jpm.api.Conformable;
 import com.jpm.dictionary.DefaultFixDictionary;
-import com.jpm.interfacce.Conformable;
-import com.jpm.interfacce.FixTagLookup;
+import com.jpm.api.FixTagLookup;
 
 import java.util.Arrays;
 import java.util.HashMap;

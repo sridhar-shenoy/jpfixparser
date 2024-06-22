@@ -1,4 +1,4 @@
-package com.jpm.interfacce;
+package com.jpm.api;
 
 import com.jpm.exception.MalformedFixMessageException;
 

@@ -1,18 +1,15 @@
 package com.jpm.fixparser;
 
 
+import com.jpm.api.*;
 import com.jpm.exception.MalformedFixMessageException;
 import com.jpm.helper.FixMessageIndexer;
 import com.jpm.helper.FixTag;
 import com.jpm.helper.RepeatingGroupHandler;
-import com.jpm.interfacce.Conformable;
-import com.jpm.interfacce.FixMessageParser;
-import com.jpm.interfacce.FixTagAccessor;
-import com.jpm.interfacce.FixTagLookup;
 
 import static com.jpm.exception.ErrorMessages.*;
 
-public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, FixMessageParser {
+public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, FixMessageParser, RepeatTagAccessor {
 
     public static final char EQUALS_DELIMITER = '=';
     private final char delimiter;
@@ -21,6 +18,17 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
     private final RepeatingGroupHandler repeatGroupIndexer;
     private final FixTag fixTag;
     private final FixTagLookup dictionary;
+    /**
+     *  incoming fix message must be copied to a local byte array
+     *  length of this byte array is decided by the policy class
+     */
+    private byte[] rawFixMessage;
+
+    /**
+     * This variable is set to length if the fixmessage currently being parsed
+     */
+    private int rawFixMessageLength;
+
 
     /**
      * @param policy
@@ -31,6 +39,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         fixMessageIndexer = new FixMessageIndexer(policy);
         repeatGroupIndexer = new RepeatingGroupHandler(policy);
         dictionary = policy.dictionary();
+        rawFixMessage = new byte[policy.maxLengthOfFixMessage()];
     }
 
     @Override
@@ -38,7 +47,10 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         if (msg == null) {
             throwException(NULL_MESSAGE);
         }
-        initializeInternalCache(msg);
+        fixTag.reset();
+        fixMessageIndexer.reset();
+        rawFixMessageLength = msg.length;
+        System.arraycopy(msg, 0, rawFixMessage, 0, rawFixMessageLength);
 
         int currentTagIndex = 0;
         int currentRepeatGroupTagIndex = 0;
@@ -46,9 +58,9 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         boolean parsingNextTag = true;
         boolean parsedValue = false;
 
-        for (int i = 0; i < fixMessageIndexer.getMessageLength(); i++) {
+        for (int i = 0; i < rawFixMessageLength; i++) {
             if (parsingNextTag) {
-                if (fixMessageIndexer.isCharEquals(i, EQUALS_DELIMITER)) {
+                if (isCharEquals(i, EQUALS_DELIMITER)) {
                     //-- At this point we have FixTag constructed. Index it and update flags
 
                     int tag = fixTag.getTag();
@@ -68,7 +80,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                 }
             } else {
                 //-- keep moving currentTagIndex until we reach the agreed delimiter
-                if (fixMessageIndexer.isCharEquals(i, delimiter)) {
+                if (isCharEquals(i, delimiter)) {
                     int valueLength = i - (inRepeatGroup ? repeatGroupIndexer.getValueIndexForTag(currentTagIndex) : fixMessageIndexer.getValueIndexForTag(fixTag.getTag()));
                     //-- Ensure we have a valid value
                     if (valueLength == 0) {
@@ -109,11 +121,6 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         return fixMessageIndexer.addTagAndGetIndex(tag);
     }
 
-    private void initializeInternalCache(byte[] msg) {
-        fixTag.reset();
-        fixMessageIndexer.copyToLocalCache(msg);
-    }
-
     private void validateFixTag(String errorTest) throws MalformedFixMessageException {
         if (fixTag.isInvalid()) {
             throwException(errorTest);
@@ -124,15 +131,24 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         throw new MalformedFixMessageException(missingTag);
     }
 
+    @Override
     public String getStringValueForTag(int tag) {
         return new String(getByteValueForTag(tag));
     }
 
-    /**
-     * @param tag
-     * @return
-     */
+    @Override
     public byte[] getByteValueForTag(int tag) {
-        return fixMessageIndexer.getByteValueForTag(tag);
+        int index = fixMessageIndexer.getIndexForTag(tag);
+        if (index != -1) {
+            int length = fixMessageIndexer.getValueLengthForTag(tag);
+            byte[] value = new byte[length];
+            System.arraycopy(rawFixMessage, fixMessageIndexer.getValueIndexForTag(tag), value, 0, length);
+            return value;
+        }
+        return null;
+    }
+
+    public boolean isCharEquals(int i, char character) {
+        return rawFixMessage[i] == character;
     }
 }

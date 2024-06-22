@@ -1,6 +1,6 @@
 package com.jpm.helper;
 
-import com.jpm.interfacce.Conformable;
+import com.jpm.api.Conformable;
 
 public final class FixTag {
     public static final int BASE = 10;

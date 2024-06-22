@@ -1,4 +1,4 @@
-package com.jpm.interfacce;
+package com.jpm.api;
 
 public interface Conformable {
     int maxNumberOfTagValuePairPerMessage();
