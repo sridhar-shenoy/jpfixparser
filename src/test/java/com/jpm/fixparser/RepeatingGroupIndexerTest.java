@@ -1,19 +1,19 @@
 package com.jpm.fixparser;
 
-import com.jpm.helper.RepeatingGroupHandler;
+import com.jpm.helper.RepeatingGroupIndexer;
 import com.jpm.policy.DefaultPolicy;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class RepeatingGroupHandlerTest {
+public class RepeatingGroupIndexerTest {
 
-    private RepeatingGroupHandler handler;
+    private RepeatingGroupIndexer handler;
 
     @Before
     public void setUp() {
-        handler = new RepeatingGroupHandler(DefaultPolicy.getDefaultPolicy());
+        handler = new RepeatingGroupIndexer(DefaultPolicy.getDefaultPolicy());
     }
 
     @Test
