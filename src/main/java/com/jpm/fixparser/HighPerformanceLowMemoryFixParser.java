@@ -50,7 +50,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
                 }
             } else {
                 //-- keep moving currentTagIndex until we reach the agreed delimiter
-                if (indexer.isDelimiter(i, this)) {
+                if (indexer.isDelimiter(i)) {
                     //-- (i - previously recorded Starting position of the value ) is the length of the value
                     int valueLength = i - indexer.getValueIndexForTag(fixTag.getTag());
 
