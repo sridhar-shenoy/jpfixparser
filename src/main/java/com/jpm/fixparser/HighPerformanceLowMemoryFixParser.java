@@ -37,6 +37,8 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
 
     private int currentTagIndex;
 
+    private final FixMessageIndexer indexer;
+
     /**
      * @param policy
      */
@@ -44,7 +46,7 @@ public final class HighPerformanceLowMemoryFixParser implements FixTagAccessor, 
         this.policy = policy;
         this.delimiter = policy.getFixDelimiter();
         this.rawFixMessage = new byte[policy.maxLengthOfFixMessage()];
-
+        indexer = new FixMessageIndexer(policy);
 
         this.tagLookupIndices = new int[policy.getMaxFixTagSupported()];
 
