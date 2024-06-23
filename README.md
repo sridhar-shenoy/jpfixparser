@@ -53,7 +53,7 @@ Constraints:
 #### Machine
 > Intel64 Family 6 Model 165 Stepping 5 GenuineIntel ~800 Mhz
 
-### RESULT #1 - Performance with non-realistic and long fix message
+### RESULT #1 - Performance with non-realistic and long fix message (worst-case scenario)
 #### Fix Message used
 * Sample fix message at the bottom of this page
 * This message is an unrealistic Fix message just to gauge worst case performance
