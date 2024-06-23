@@ -38,6 +38,7 @@ Constraints:
 * Use Only one single loop to parse the Fix Message hence achieving **O(N)** time complexity
 * **No new objects are created** during lifecycle to achieve **Zero Garbage** target
 * All Lookups must be array based to achieve **O(1)** read operation
+* Implemented this using **TDD** approach
 
  
 # BenchMark
