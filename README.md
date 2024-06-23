@@ -33,6 +33,12 @@ Constraints:
 * Supports reading of **multiple occurrences** of the same repeating groups
 * Support readonly clone method to store messages within application cache *optimized for memory* 
 
+### Approach ###
+* Keep all internal state as fixed length arrays and only initialized at startup. This achieves **O(1)** space complexity
+* Use Only one single loop to parse the Fix Message hence achieving **O(N)** time complexity
+* **No new objects are created** during lifecycle to achieve **Zero Garbage** target
+* All Lookups must be array based to achieve **O(1)** read operation
+* 
 # BenchMark
 
 #### How do you read this report?
