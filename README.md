@@ -38,7 +38,8 @@ Constraints:
 #### How do you read this report?
 * `HighPerformanceLowMemoryFixParser` Is our offering that parses with zero garbage footprint
 * `TestOnlyParser` is a typical string based parser using java collections and strings
-* In each of these row sample fix message `iteration` amount of fis message was given to parse
+* In each of these row sample fix message is passed to parse method `iteration` amount of time
+* For each of these executions time and memory footprint is recorded.
 
 #### Machine
 > Intel64 Family 6 Model 165 Stepping 5 GenuineIntel ~800 Mhz
