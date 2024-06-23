@@ -24,11 +24,11 @@ Constraints:
 
 
 # Highlights #
-* On windows this parser displayed a performance of **1.4 micro secs** per message and uses approximately **50 Kb** memory with default settings
-* On windows it should consume approximately **600,000** messages per sec.  
+* On windows this parser displayed a performance of **1.24 micro secs** per message and uses approximately **50 Kb** memory with default settings
+* On windows it should consume approximately **800,000** messages per sec.  
 * This parser has **Zero garbage**, if used with our recommended best practice. ( benchmark results below )
-* Parsing has a time complexity of **O(N)** and space complexity of O(1).  
-* **Constant memory** usage after prolonged usage.
+* Parsing has a time complexity of **O(N)** and space complexity of **O(1)**.  
+* Parser memory usage remains **Constant** for the entire lifecycle.
 * Reading operation has a time complexity of **O(1)**  and with no garbage if used with our recommended best practice.
 * Supports reading of **multiple occurrences** of the same repeating groups
 * Support readonly clone method to store messages within application cache *optimized for memory* 
@@ -71,7 +71,7 @@ Constraints:
 
 ```
 ### RESULT #2 - Production like fix message  
-#### Fix Message uses
+#### Fix Message used
 > 8=FIX.4.4|9=193|35=AD|49=bthomas_trading_brokers_llc|56=CMESTPFIX2|34=7|57=STP|52=20160330-21:23:01.588|779=20160330-20:50:48.800|568=d0f298f7-a285-4cd8-9207-9eab0630582a|569=1|263=1|453=1|448=ace4|52=7|442=2|10=099|
 
 ##### Source
@@ -79,7 +79,7 @@ Constraints:
 
 #### Report analysis
 * Table shows
-    * `HighPerformanceLowMemoryFixParser` having 0 Memory footprint and parsing in about 1.46 micro sec
+    * `HighPerformanceLowMemoryFixParser` having 0 Memory footprint and parsing in about 1.24 micro sec
     * `TestOnlyParser` on the other hand has a lot of garbage during operations
 ```
                          Class Name  |  Iteration |       Total Time taken  |                Average Time per message |       Memory Usage | Total Memory
