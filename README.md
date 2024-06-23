@@ -38,8 +38,10 @@ Constraints:
 * Use Only one single loop to parse the Fix Message hence achieving **O(N)** time complexity
 * **No new objects are created** during lifecycle to achieve **Zero Garbage** target
 * All Lookups must be array based to achieve **O(1)** read operation
-* 
+
+ 
 # BenchMark
+> Please refer to  https://github.com/sridhar-shenoy/jpfixparser/blob/master/src/test/java/com/jpm/benchmark/ParsingPerformanceTest.java
 
 #### How do you read this report?
 * `HighPerformanceLowMemoryFixParser` Is our offering that parses with zero garbage footprint
