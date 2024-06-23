@@ -106,7 +106,7 @@ public class ParsingPerformanceTest extends FixMessageTestBase {
 
     private void warmUp(FixMessageParser artifact, ArrayList<byte[]> data) throws MalformedFixMessageException {
         log("Warming up " + artifact.getClass().getSimpleName());
-        exec(artifact, 5000, data);
+        exec(artifact, maxMessages/70, data);
     }
 
     private void exec(FixMessageParser artifact, int mamMessage, ArrayList<byte[]> prodData1) {
