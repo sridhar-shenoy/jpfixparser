@@ -7,6 +7,9 @@ import com.jpm.exception.MalformedFixMessageException;
 import com.jpm.fixparser.FixMessageParserFactory;
 import com.jpm.policy.DefaultPolicy;
 
+/*
+  The Main Class is written just to show case the usage of the api. 
+*/
 public class Main {
 
     public static void main(String[] args) throws MalformedFixMessageException {
