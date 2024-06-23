@@ -1,5 +1,10 @@
 package com.jpm.exception;
 
+/**
+ * This class maintains the Error Constants needed by the {@link com.jpm.api.FixMessageParser}
+ *
+ * @author Sridhar S Shenoy
+ */
 public final class ErrorMessages {
     private ErrorMessages(){
     }

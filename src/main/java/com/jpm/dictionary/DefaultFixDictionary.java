@@ -4,6 +4,14 @@ import com.jpm.api.FixTagLookup;
 
 import java.util.Arrays;
 
+/**
+ * This is a mocked up Dictionary. In its ideal state this should load from FIX xml files to identify the tag and its associated
+ * Repeating groups.
+ *
+ * For the sake pf demonstration only RepeatGroup 453 has been hardcoded.
+ *
+ * @author Sridhar S Shenoy
+ */
 public class DefaultFixDictionary implements FixTagLookup {
     private int[] repeatGroupBeginTag;
     private int[][] repeatGroupMembers;

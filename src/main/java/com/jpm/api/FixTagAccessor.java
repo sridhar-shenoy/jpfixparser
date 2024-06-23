@@ -1,5 +1,10 @@
 package com.jpm.api;
 
+/**
+ * This interface defines the readonly operations available for clients
+ *
+ * @author Sridhar S Shenoy
+ */
 public interface FixTagAccessor {
     String getStringValueForTag(int tag);
     byte[] getByteValueForTag(int tag);

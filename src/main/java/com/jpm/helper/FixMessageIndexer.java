@@ -5,7 +5,7 @@ import com.jpm.api.ParsingPolicy;
 import java.util.Arrays;
 
 /**
- * This class maintains a <strong>Single Responsibility to handle position of all simple tags ( non-repeatable ) within a fix message.</strong>
+ * This class maintains a <strong>Single Responsibility to handle positions and its value lengths of all simple tags ( non-repeatable ) within a fix message.</strong>
  *
  * The actual fix message in its raw form resides in {@link com.jpm.fixparser.FixMessage} class
  * <p>{@code fixTags} holds reference to all tags within a fix message

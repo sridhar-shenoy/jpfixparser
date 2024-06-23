@@ -6,6 +6,13 @@ import com.jpm.api.FixTagLookup;
 import com.jpm.helper.FixMessageIndexer;
 import com.jpm.helper.RepeatingGroupIndexer;
 
+/**
+ * This class the <strong>Single Responsibility to wrap the raw fix message and delegate operation based on tags</strong>
+ * This class holds reference to {@link FixMessageIndexer} & {@link RepeatingGroupIndexer} who maintain the indexes of these tags and values
+ *
+ * Any operation of rawfixmessage must be defined here.
+ * @author Sridhar S Shenoy
+ */
 final class FixMessage implements FixTagAccessor {
 
     public static final char EQUALS_SIGN = '=';
@@ -50,10 +57,6 @@ final class FixMessage implements FixTagAccessor {
         return null;
     }
 
-    /**
-     * @param tag
-     * @param output
-     */
     @Override
     public int copyByteValuesToArray(int tag, byte[] output) {
         int index = fixMessageIndexer.getIndexForTag(tag);
@@ -96,12 +99,10 @@ final class FixMessage implements FixTagAccessor {
         return -1;
     }
 
-
     @Override
     public String getStringValueForTag(int tag, int repeatBeginTag, int instance, int instanceInMessage) {
         return new String(getByteValueForTag(tag, repeatBeginTag, instance, instanceInMessage));
     }
-
 
     public void copyFixMessageToLocal(byte[] bytes) {
         this.rawFixMessageLength = bytes.length;

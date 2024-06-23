@@ -4,6 +4,9 @@ import com.jpm.api.ParsingPolicy;
 import com.jpm.api.FixMessageParser;
 import com.jpm.policy.DefaultPolicy;
 
+/**
+ *
+ */
 public final class FixMessageParserFactory {
 
     private FixMessageParserFactory() {

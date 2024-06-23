@@ -9,12 +9,34 @@ import com.jpm.policy.DefaultPolicy;
 import static com.jpm.exception.ErrorMessages.*;
 
 /**
- * This class maintains a low memory footprint with pre-initialized arrays.
- * The
+ * The <strong>single responsibility of this class is to parse and delegate read operations to FixMessage</strong>
+ * Parsing logic must happen here.During parsing
+ *  ** any interim state needed must be delegated to {@link ParserState}
+ *  ** all position keeping tasks must be delegated to {@link FixMessage}
  *
+ *  This class handles the core logic involved in parsing a fix message and
+ *  decisions need to be taken during ambiguity,
+ *
+ *  -- This class achieves the performance by doing all the parsing in one loop to retain O(N) complexity
+ *
+ *  Example usage of accessing parser
  * <blockquote>
  *  <pre>
- *  x.clone() != x
+ *     FixMessageParser fixMessageParser = FixMessageParserFactory.getFixMessageParser();
+ *         String clientsFixMessage = "8=FIX.4.2\u00019=178\u000135=D\u000134=4\u000149=CLIENT12\u000152=20130615-19:30:00\u000156=BROKER12\u0001" +
+ *                 "453=2\u0001" +
+ *                 "448=JPMORGAN\u0001447=5\u0001452=6\u0001" +
+ *                 "448=Client2\u0001447=D\u0001452=7\u0001" +
+ *                 "55=0001.HK\u0001" +
+ *                 "453=1\u0001" +
+ *                 "448=BCAN\u0001447=1\u0001452=100\u0001" +
+ *                 "10=037\u0001";
+ *         fixMessageParser.parse(clientsFixMessage.getBytes());
+ *
+ *         System.out.println(fixMessageParser.getStringValueForTag(8));
+ *         System.out.println(fixMessageParser.getStringValueForTag(35));
+ *
+ *         System.out.println(fixMessageParser.getStringValueForTag(448, 453, 0, 0));
  *  </pre>
  *  </blockquote>
  *
@@ -23,7 +45,7 @@ import static com.jpm.exception.ErrorMessages.*;
  * @author Sridhar S Shenoy
  */
 
-public final class HighPerformanceLowMemoryFixParser implements FixMessageParser, FixTagAccessor {
+public final class HighPerformanceLowMemoryFixParser implements FixMessageParser {
 
     private final NumericValue numericValue;
     private final NumericValue noOfRepeatGroupValue;

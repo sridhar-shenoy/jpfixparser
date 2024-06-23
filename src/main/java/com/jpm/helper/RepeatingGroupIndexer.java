@@ -1,7 +1,18 @@
 package com.jpm.helper;
 
 import com.jpm.api.ParsingPolicy;
-
+/**
+ * This class maintains a <strong>Single Responsibility to handle positions & its value lengths of all repeating group tags within a fix message.</strong>
+ *
+ * The actual fix message in its raw form resides in {@link com.jpm.fixparser.FixMessage} class
+ * <p>{@code fixTags} holds reference to all tags within a fix message
+ * {@code currentTagIndex} maintains the current index of this array</p>
+ *
+ * <p>{@code tagLookupIndices} is a fixed length array whose index is the actual fix tag number
+ * and value is the index to {@code fixtags}
+ *
+ * @author Sridhar S Shenoy
+ * */
 public class RepeatingGroupIndexer {
     public static final int TAG_NUMBER = 0;
     public static final int TAG_OCCURENCE_WITHIN_GROUP = 1;

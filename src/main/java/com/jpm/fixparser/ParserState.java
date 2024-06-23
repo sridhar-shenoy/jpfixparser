@@ -1,5 +1,11 @@
 package com.jpm.fixparser;
 
+/**
+ * The sole <strong>responsibility of this class is to assist {@link HighPerformanceLowMemoryFixParser} maintain its state</strong>
+ * so that parser can focus on parsing.
+ *
+ * @author Sridhar S Shenoy
+ */
 final class ParserState {
     int currentTagIndex = 0;
     int currentRepeatGroupTagIndex = 0;
