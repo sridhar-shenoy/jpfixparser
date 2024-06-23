@@ -65,6 +65,13 @@ public final class HighPerformanceLowMemoryFixParser implements FixMessageParser
         fixMessage = new FixMessage(policy);
     }
 
+    /**
+     * This method is responsible to parse the incoming fix message
+     * This has just one loop to maintain O(N) complexity
+     *
+     * @param msg
+     * @throws MalformedFixMessageException
+     */
     @Override
     public void parse(byte[] msg) throws MalformedFixMessageException {
         if (msg == null) {
@@ -98,6 +105,9 @@ public final class HighPerformanceLowMemoryFixParser implements FixMessageParser
         return highPerformanceLowMemoryFixParser;
     }
 
+    /*
+        Each character can be part of tag or value
+     */
     private void parseBytesAt(int index) throws MalformedFixMessageException {
         if (state.shouldParseForTag()) {
             parseTag(index);
@@ -106,6 +116,11 @@ public final class HighPerformanceLowMemoryFixParser implements FixMessageParser
         }
     }
 
+    /*
+        Parsing tag has two routes
+         - continue to parse tag(as number)
+         - tag is complete
+     */
     private void parseTag(int index) throws MalformedFixMessageException {
         if (fixMessage.hasCompletedParsingTag(index)) {
             handleTagParsingCompletionTasks(index);
@@ -114,6 +129,15 @@ public final class HighPerformanceLowMemoryFixParser implements FixMessageParser
         }
     }
 
+    /*
+        parsing value is tricky
+        - it can be the beginning of repeatGroup in which case we need to store the value
+        - end of simple tag
+        - end of repeatGroup last tag
+        - still in repeat group
+        - end of inner repeat group
+        - handle case where all tags are not mandatory
+     */
     private void parseValue(int index) throws MalformedFixMessageException {
         if (fixMessage.hasCompletedParsingTagValuePair(index)) {
             handleTagValueParsingCompletionTasks(index);
@@ -241,11 +265,6 @@ public final class HighPerformanceLowMemoryFixParser implements FixMessageParser
         return fixMessage.getByteValueForTag(tag);
     }
 
-    /**
-     * @param tag
-     * @param output
-     * @return
-     */
     @Override
     public int copyByteValuesToArray(int tag, byte[] output) {
         return fixMessage.copyByteValuesToArray(tag,output);
