@@ -1,6 +1,6 @@
 package com.jpm.helper;
 
-import com.jpm.api.Conformable;
+import com.jpm.api.ParsingPolicy;
 
 public class RepeatingGroupIndexer {
     public static final int TAG_NUMBER = 0;
@@ -11,7 +11,7 @@ public class RepeatingGroupIndexer {
     private final int[][] repeatingGroupOccurrenceIndex;
     private int currentArrayIndex = 0;
 
-    public RepeatingGroupIndexer(Conformable policy) {
+    public RepeatingGroupIndexer(ParsingPolicy policy) {
         repeatingGroupOccurrenceIndex = new int[policy.maxNumberOfRepeatingGroupAllowed()][5];
     }
 

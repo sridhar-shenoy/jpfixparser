@@ -1,9 +1,21 @@
 package com.jpm.helper;
 
-import com.jpm.api.Conformable;
+import com.jpm.api.ParsingPolicy;
 
 import java.util.Arrays;
 
+/**
+ * This class maintains a <strong>Single Responsibility to handle position of all simple tags ( non-repeatable ) within a fix message.</strong>
+ *
+ * The actual fix message in its raw form resides in {@link com.jpm.fixparser.FixMessage} class
+ * <p>{@code fixTags} holds reference to all tags within a fix message
+ * {@code currentTagIndex} maintains the current index of this array</p>
+ *
+ * <p>{@code tagLookupIndices} is a fixed length array whose index is the actual fix tag number
+ * and value is the index to {@code fixtags}
+ *
+ * @author Sridhar S Shenoy
+ * */
 public final class FixMessageIndexer {
 
     /**
@@ -34,22 +46,42 @@ public final class FixMessageIndexer {
     private int currentTagIndex = 0;
 
 
-    public FixMessageIndexer(Conformable policy) {
+    public FixMessageIndexer(ParsingPolicy policy) {
         this.tagLookupIndices = new int[policy.maxFixTagSupported()];
         this.fixTags = new int[policy.maxNumberOfTagValuePairPerMessage()];
         this.valueIndexLengthMatrix = new int[policy.maxNumberOfTagValuePairPerMessage()][2];
     }
 
+    /**
+     * This class accepts fix tag to be indexed for parsing.
+     * based on the {@code currentTagIndex }
+     *
+     * This method returns the index for this tag.
+     * @param tag
+     * @return
+     */
     public int addTagAndGetIndex(int tag) {
         fixTags[currentTagIndex] = tag;
         tagLookupIndices[tag] = currentTagIndex;
         return currentTagIndex++;
     }
 
+    /**
+     * When a fix tag ia parsed, it must be added to index using {@code addTagAndGetIndex} method
+     * This method sets the starting position of the value within the {@code rawfixMessage} in {@link com.jpm.fixparser.FixMessage } class
+     * @param index
+     * @param valueIndex
+     */
     public void addValueIndex(int index, int valueIndex) {
         valueIndexLengthMatrix[index][0] = valueIndex;
     }
 
+    /**
+     * When a fix tag ia parsed, it must be added to index using {@code addTagAndGetIndex} method
+     * This method sets the length of the value within the {@code rawfixMessage} in {@link com.jpm.fixparser.FixMessage } class
+     * @param index
+     * @param length
+     */
     public void addValueLength(int index, int length) {
         valueIndexLengthMatrix[index][1] = length;
     }

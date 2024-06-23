@@ -1,15 +1,15 @@
 package com.jpm.dictionary;
 
-import com.jpm.api.Conformable;
+import com.jpm.api.ParsingPolicy;
 import com.jpm.api.FixTagLookup;
 
 import java.util.Arrays;
 
 public class DefaultFixDictionary implements FixTagLookup {
-    int[] repeatGroupBeginTag;
-    int[][] repeatGroupMembers;
+    private int[] repeatGroupBeginTag;
+    private int[][] repeatGroupMembers;
 
-    public DefaultFixDictionary(Conformable policy) {
+    public DefaultFixDictionary(ParsingPolicy policy) {
         repeatGroupBeginTag = new int[policy.maxFixTagSupported()];
         repeatGroupMembers = new int[policy.maxNumberOfRepeatingGroupAllowed()][20];
         Arrays.fill(repeatGroupBeginTag, -1);

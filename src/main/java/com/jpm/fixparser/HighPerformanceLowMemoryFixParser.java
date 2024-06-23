@@ -8,6 +8,21 @@ import com.jpm.policy.DefaultPolicy;
 
 import static com.jpm.exception.ErrorMessages.*;
 
+/**
+ * This class maintains a low memory footprint with pre-initialized arrays.
+ * The
+ *
+ * <blockquote>
+ *  <pre>
+ *  x.clone() != x
+ *  </pre>
+ *  </blockquote>
+ *
+ *
+ *
+ * @author Sridhar S Shenoy
+ */
+
 final class HighPerformanceLowMemoryFixParser implements FixMessageParser, FixTagAccessor {
 
     private final NumericValue numericValue;
@@ -19,7 +34,7 @@ final class HighPerformanceLowMemoryFixParser implements FixMessageParser, FixTa
     private final FixMessage fixMessage;
     private int lengthOfTagMemebers = 0;
 
-    public HighPerformanceLowMemoryFixParser(Conformable policy) {
+    public HighPerformanceLowMemoryFixParser(ParsingPolicy policy) {
         numericValue = new NumericValue(policy);
         noOfRepeatGroupValue = new NumericValue(policy);
         dictionary = policy.dictionary();
@@ -174,8 +189,8 @@ final class HighPerformanceLowMemoryFixParser implements FixMessageParser, FixTa
         }
     }
 
-    private void parseNumber(byte b, NumericValue numericValue) throws MalformedFixMessageException {
-        numericValue.append(b);
+    private void parseNumber(byte b, NumericValue value) throws MalformedFixMessageException {
+        value.append(b);
         validateFixTag(MALFORMED_TAG_VALUE_PAIR);
     }
 
@@ -204,6 +219,16 @@ final class HighPerformanceLowMemoryFixParser implements FixMessageParser, FixTa
         return fixMessage.getByteValueForTag(tag);
     }
 
+    /**
+     * @param tag
+     * @param output
+     * @return
+     */
+    @Override
+    public int copyByteValuesToArray(int tag, byte[] output) {
+        return fixMessage.copyByteValuesToArray(tag,output);
+    }
+
     @Override
     public byte[] getByteValueForTag(int tag, int repeatBeginTag, int instance, int instanceInMessage) {
        return fixMessage.getByteValueForTag(tag,repeatBeginTag,instance,instanceInMessage);
@@ -212,6 +237,11 @@ final class HighPerformanceLowMemoryFixParser implements FixMessageParser, FixTa
     @Override
     public String getStringValueForTag(int tag, int repeatBeginTag, int instance, int instanceInMessage) {
         return fixMessage.getStringValueForTag(tag, repeatBeginTag, instance, instanceInMessage);
+    }
+
+    @Override
+    public int copyByteValuesToArray(int tag, int repeatBeginTag, int instance, int instanceInMessage, byte[] output) {
+        return fixMessage.copyByteValuesToArray(tag,repeatBeginTag,instance,instanceInMessage,output);
     }
 
     private void resetParserState() {

@@ -1,6 +1,6 @@
 package com.jpm.api;
 
-public interface Conformable {
+public interface ParsingPolicy {
     int maxNumberOfTagValuePairPerMessage();
     int maxFixTagSupported();
     char delimiter();

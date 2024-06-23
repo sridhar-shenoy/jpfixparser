@@ -1,16 +1,19 @@
 package com.jpm.fixparser;
 
-import com.jpm.api.Conformable;
+import com.jpm.api.ParsingPolicy;
 import com.jpm.api.FixMessageParser;
 import com.jpm.policy.DefaultPolicy;
 
-public class FixMessageParserFactory {
+public final class FixMessageParserFactory {
+
+    private FixMessageParserFactory() {
+    }
 
     public static FixMessageParser getFixMessageParser() {
         return new HighPerformanceLowMemoryFixParser(DefaultPolicy.getDefaultPolicy());
     }
 
-    public static FixMessageParser getFixMessageParser(Conformable policy) {
+    public static FixMessageParser getFixMessageParser(ParsingPolicy policy) {
         return new HighPerformanceLowMemoryFixParser(policy);
     }
 }

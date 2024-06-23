@@ -4,10 +4,9 @@ import com.jpm.exception.MalformedFixMessageException;
 import com.jpm.policy.DefaultPolicy;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
-public class SimpleFixMessageParsingTest extends FixMessageTestBase {
+public class ParsingSimpleFixMessageTest extends FixMessageTestBase {
 
     @Test
     public void parseSimpleFixMessageForStringValues() throws MalformedFixMessageException {
@@ -72,16 +71,6 @@ public class SimpleFixMessageParsingTest extends FixMessageTestBase {
         assertNull(parser.getByteValueForTag(10));
     }
 
-    /*
-      Randomized tests for Text parsing
-    */
-    @Test
-    public void parseExtraLongTextMessage() throws MalformedFixMessageException {
-        String randomLongString = randomLongString();
-        parser.parse(getBytes("8=FIX.4.4\u00019=148\u000135=D\u000134=1080\u000158=" + randomLongString + "\u000110=092\u0001"));
-        assertEquals(randomLongString, parser.getStringValueForTag(58));
-    }
-
     @Test
     public void inputFixMessageCaneBeMutatedAfterParsing() throws MalformedFixMessageException {
         byte[] bytes = getBytes("8=FIX.4.4\u000121=1\u0001");
@@ -92,4 +81,33 @@ public class SimpleFixMessageParsingTest extends FixMessageTestBase {
         assertNull(parser.getByteValueForTag(10));
     }
 
+
+    //-- randomized tests
+    @Test
+    public void parseExtraLongTextMessage() throws MalformedFixMessageException {
+        String randomLongString = randomStringOfSize(100);
+        parser.parse(getBytes("8=FIX.4.4\u00019=148\u000135=D\u000134=1080\u000158=" + randomLongString + "\u000110=092\u0001"));
+        assertEquals(randomLongString, parser.getStringValueForTag(58));
+    }
+
+    @Test
+    public void parseTagAndCopyToClientsProvidedArrayWithExactLength() throws MalformedFixMessageException {
+        String randomString = randomStringOfSize(10);
+        parser.parse(getBytes("8=FIX.4.4\u000158=" + randomString + "\u0001"));
+
+        byte[] clientsArray = new byte[10];
+        int actualLength = parser.copyByteValuesToArray(58, clientsArray);
+        assertEquals(randomString.length(),actualLength);
+        assertEquals(randomString,new String(clientsArray));
+    }
+
+    @Test
+    public void parseTagAndCopyToClientsProvidedArrayWithSmallerLength() throws MalformedFixMessageException {
+        String s = randomStringOfSize(10);
+        parser.parse(getBytes("8=FIX.4.4\u000158=" + s + "\u0001"));
+
+        byte[] clientsArray = new byte[5];
+        int result = parser.copyByteValuesToArray(58, clientsArray);
+        assertEquals(-1,result);
+    }
 }

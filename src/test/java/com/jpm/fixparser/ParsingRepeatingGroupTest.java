@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class RepeatingGroupParsingTest extends FixMessageTestBase {
+public class ParsingRepeatingGroupTest extends FixMessageTestBase {
     @Test
     public void parseSingleInstanceRepeatingGroup() throws MalformedFixMessageException {
         parser.parse(getBytes("8=FIX.4.2\u00019=178\u000135=D\u000134=4\u000149=CLIENT12\u000152=20130615-19:30:00\u000156=BROKER12\u0001" +
@@ -44,5 +44,11 @@ public class RepeatingGroupParsingTest extends FixMessageTestBase {
         assertEquals("1", parser.getStringValueForTag(447,453,0,1));
 
         assertEquals("0001.HK", parser.getStringValueForTag(55));
+
+        byte[] output = new byte[4];
+        int actualLength = parser.copyByteValuesToArray(448, 453, 0, 1, output);
+        assertEquals(4, actualLength);
+        assertEquals("BCAN", new String(output));
+
     }
 }

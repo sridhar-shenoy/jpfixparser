@@ -1,6 +1,6 @@
 package com.jpm.fixparser;
 
-import com.jpm.api.Conformable;
+import com.jpm.api.ParsingPolicy;
 import com.jpm.api.FixTagAccessor;
 import com.jpm.api.FixTagLookup;
 import com.jpm.helper.FixMessageIndexer;
@@ -25,7 +25,7 @@ final class FixMessage implements FixTagAccessor {
      */
     private int rawFixMessageLength;
 
-    public FixMessage(Conformable policy) {
+    public FixMessage(ParsingPolicy policy) {
         fixMessageIndexer = new FixMessageIndexer(policy);
         repeatGroupIndexer = new RepeatingGroupIndexer(policy);
         rawFixMessage = new byte[policy.maxLengthOfFixMessage()];
@@ -50,6 +50,23 @@ final class FixMessage implements FixTagAccessor {
         return null;
     }
 
+    /**
+     * @param tag
+     * @param output
+     */
+    @Override
+    public int copyByteValuesToArray(int tag, byte[] output) {
+        int index = fixMessageIndexer.getIndexForTag(tag);
+        if (index != -1) {
+            int length = fixMessageIndexer.getValueLengthForTag(tag);
+            if (length <= output.length) {
+                System.arraycopy(rawFixMessage, fixMessageIndexer.getValueIndexForTag(tag), output, 0, length);
+                return length;
+            }
+        }
+        return -1;
+    }
+
     @Override
     public byte[] getByteValueForTag(int tag, int repeatBeginTag, int instance, int instanceInMessage) {
         if (dictionary.isTagMemberOfRepeatGroup(tag, repeatBeginTag)) {
@@ -65,13 +82,30 @@ final class FixMessage implements FixTagAccessor {
     }
 
     @Override
+    public int copyByteValuesToArray(int tag, int repeatBeginTag, int instance, int instanceInMessage, byte[] output) {
+        if (dictionary.isTagMemberOfRepeatGroup(tag, repeatBeginTag)) {
+            int index = repeatGroupIndexer.getIndexForTag(tag, instance, instanceInMessage);
+            if (index != -1) {
+                int length = repeatGroupIndexer.getValueLengthForIndex(index);
+                if (length <= output.length) {
+                    System.arraycopy(rawFixMessage, repeatGroupIndexer.getValueIndexForRepeatTagIndex(index), output, 0, length);
+                    return length;
+                }
+            }
+        }
+        return -1;
+    }
+
+
+    @Override
     public String getStringValueForTag(int tag, int repeatBeginTag, int instance, int instanceInMessage) {
         return new String(getByteValueForTag(tag, repeatBeginTag, instance, instanceInMessage));
     }
 
-    public void copyFixMessageToLocal(byte[] rawFixMessage) {
-        this.rawFixMessageLength = rawFixMessage.length;
-        System.arraycopy(rawFixMessage, 0, this.rawFixMessage, 0, rawFixMessageLength);
+
+    public void copyFixMessageToLocal(byte[] bytes) {
+        this.rawFixMessageLength = bytes.length;
+        System.arraycopy(bytes, 0, this.rawFixMessage, 0, rawFixMessageLength);
     }
 
     public void reset() {

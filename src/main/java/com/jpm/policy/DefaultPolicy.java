@@ -1,6 +1,6 @@
 package com.jpm.policy;
 
-import com.jpm.api.Conformable;
+import com.jpm.api.ParsingPolicy;
 import com.jpm.dictionary.DefaultFixDictionary;
 import com.jpm.api.FixTagLookup;
 
@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultPolicy implements Conformable {
+public class DefaultPolicy implements ParsingPolicy {
 
     private final int maxNumberOfTagValuePairPerMessage;
     private final int maxFixTagSupported;
@@ -71,11 +71,11 @@ public class DefaultPolicy implements Conformable {
         return 10;
     }
 
-    public static Conformable getDefaultPolicy(){
+    public static ParsingPolicy getDefaultPolicy(){
         return new DefaultPolicy(1000,1000,1000,'\u0001',100);
     }
 
-    public static Conformable getCustomPolicy(int maxNumberOfTagValuePair, int maxFixTags, int maxLengthOfFixMsg, char fixDelimiter, int maxRepeatingGroup){
+    public static ParsingPolicy getCustomPolicy(int maxNumberOfTagValuePair, int maxFixTags, int maxLengthOfFixMsg, char fixDelimiter, int maxRepeatingGroup){
         return new DefaultPolicy(maxNumberOfTagValuePair, maxFixTags, maxLengthOfFixMsg, fixDelimiter, maxRepeatingGroup);
     }
 }

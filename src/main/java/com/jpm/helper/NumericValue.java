@@ -1,12 +1,12 @@
 package com.jpm.helper;
 
-import com.jpm.api.Conformable;
+import com.jpm.api.ParsingPolicy;
 
 public final class NumericValue {
     public static final int BASE = 10;
     private final int maxTagSupported;
 
-    public NumericValue(Conformable policy) {
+    public NumericValue(ParsingPolicy policy) {
         this.maxTagSupported = policy.maxFixTagSupported();
     }
 
