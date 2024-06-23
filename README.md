@@ -73,7 +73,7 @@ Constraints:
 ```
 ### RESULT #2 - Production like fix message  
 #### Fix Message used
-> 8=FIX.4.4|9=193|35=AD|49=bthomas_trading_brokers_llc|56=CMESTPFIX2|34=7|57=STP|52=20160330-21:23:01.588|779=20160330-20:50:48.800|568=d0f298f7-a285-4cd8-9207-9eab0630582a|569=1|263=1|453=1|448=ace4|52=7|442=2|10=099|
+> 8=FIX.4.49=19335=AD49=bthomas_trading_brokers_llc56=CMESTPFIX234=757=STP52=20160330-21:23:01.588779=20160330-20:50:48.800568=d0f298f7-a285-4cd8-9207-9eab0630582a569=1263=1453=1448=ace452=7442=210=099
 
 ##### Source
 > https://cmegroupclientsite.atlassian.net/wiki/spaces/EPICSANDBOX/pages/46472218/CME+STP+FIX+-+Samples+for+BrokerTec+Trades
