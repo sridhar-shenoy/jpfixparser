@@ -23,7 +23,7 @@ import static com.jpm.exception.ErrorMessages.*;
  * @author Sridhar S Shenoy
  */
 
-final class HighPerformanceLowMemoryFixParser implements FixMessageParser, FixTagAccessor {
+public final class HighPerformanceLowMemoryFixParser implements FixMessageParser, FixTagAccessor {
 
     private final NumericValue numericValue;
     private final NumericValue noOfRepeatGroupValue;

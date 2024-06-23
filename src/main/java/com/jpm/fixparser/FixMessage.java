@@ -110,6 +110,7 @@ final class FixMessage implements FixTagAccessor {
 
     public void reset() {
         fixMessageIndexer.reset();
+        repeatGroupIndexer.reset();
     }
 
     public boolean hasCompletedParsingTag(int index) {

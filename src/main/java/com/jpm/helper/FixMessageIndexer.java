@@ -100,5 +100,6 @@ public final class FixMessageIndexer {
 
     public void reset() {
         Arrays.fill(this.tagLookupIndices, -1);
+        currentTagIndex =0;
     }
 }

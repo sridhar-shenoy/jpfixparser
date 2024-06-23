@@ -17,14 +17,16 @@ public class DefaultPolicy implements ParsingPolicy {
     private final char delimiter;
     private final int maxLengthOfFixMessage;
     private final int maxNumberOfRepeatingGroup;
+    private final FixTagLookup dictionary;
 
-    public DefaultPolicy(int maxNumberOfTagValuePair, int maxFixTags, int maxLengthOfFixMsg, char fixDelimiter, int maxRepeatingGroup) {
+    public DefaultPolicy(int maxNumberOfTagValuePair, int maxFixTags, int maxLengthOfFixMsg, char fixDelimiter, int maxRepeatingGroup,FixTagLookup dictionary) {
         this.fixRepeatingGroupLookupMap = new HashMap<>();
         maxNumberOfTagValuePairPerMessage = maxNumberOfTagValuePair;
         maxFixTagSupported = maxFixTags;
         delimiter = fixDelimiter;
         maxLengthOfFixMessage = maxLengthOfFixMsg;
         maxNumberOfRepeatingGroup = maxRepeatingGroup;
+        this.dictionary = dictionary;
         populateRepeatingGroups();
     }
 
@@ -63,7 +65,7 @@ public class DefaultPolicy implements ParsingPolicy {
 
     @Override
     public FixTagLookup dictionary() {
-        return new DefaultFixDictionary(this);
+        return new DefaultFixDictionary(this.maxFixTagSupported(), this.maxNumberOfRepeatingGroupAllowed());
     }
 
     @Override
@@ -72,10 +74,10 @@ public class DefaultPolicy implements ParsingPolicy {
     }
 
     public static ParsingPolicy getDefaultPolicy(){
-        return new DefaultPolicy(1000,1000,1000,'\u0001',100);
+        return new DefaultPolicy(1000,1000,1000,'\u0001',100,new DefaultFixDictionary(1000,100));
     }
 
     public static ParsingPolicy getCustomPolicy(int maxNumberOfTagValuePair, int maxFixTags, int maxLengthOfFixMsg, char fixDelimiter, int maxRepeatingGroup){
-        return new DefaultPolicy(maxNumberOfTagValuePair, maxFixTags, maxLengthOfFixMsg, fixDelimiter, maxRepeatingGroup);
+        return new DefaultPolicy(maxNumberOfTagValuePair, maxFixTags, maxLengthOfFixMsg, fixDelimiter, maxRepeatingGroup, new DefaultFixDictionary(maxFixTags,maxRepeatingGroup));
     }
 }

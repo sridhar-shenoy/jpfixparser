@@ -1,5 +1,6 @@
 package com.jpm.fixparser;
 
+import com.jpm.FixMessageTestBase;
 import com.jpm.exception.MalformedFixMessageException;
 import org.junit.Test;
 

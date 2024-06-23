@@ -1,6 +1,7 @@
-package com.jpm.fixparser;
+package com.jpm;
 
 import com.jpm.api.FixMessageParser;
+import com.jpm.fixparser.HighPerformanceLowMemoryFixParser;
 import com.jpm.policy.DefaultPolicy;
 import org.junit.BeforeClass;
 

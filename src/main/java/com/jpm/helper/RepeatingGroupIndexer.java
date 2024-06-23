@@ -87,5 +87,6 @@ public class RepeatingGroupIndexer {
     }
 
     public void reset() {
+        currentArrayIndex = 0;
     }
 }
